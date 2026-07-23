@@ -4,18 +4,18 @@
 
 ## Positioning
 
-- **Portable GoClaw Lite** for **Arch Linux** and **CachyOS**
-- Delivery format: **AppImage** (USB-friendly single file)
-- Engine: upstream Lite (`sqliteonly`) — no PostgreSQL
+- Portable GoClaw Lite for **Arch Linux** and **CachyOS**
+- AppImage delivery + **`update.sh` auto-update** from GitHub Releases
+- SQLite Lite (no PostgreSQL)
 
 ## Working
 
-- Build on CachyOS/Arch with `-tags sqliteonly,webkit2_41`
+- Build tags: `sqliteonly,webkit2_41`
 - AppImage packaging
-- Script UI language: English default, optional Russian (`LANG_UI`)
+- Script UI: English default, optional Russian
+- `update.sh` compares release tag vs `.goclaw-lite-version`
 
 ## Upstream
 
-Application: [nextlevelbuilder/goclaw](https://github.com/nextlevelbuilder/goclaw) (Lite / desktop / SQLite).
-
-This repository = community packaging for Arch/CachyOS, not an official release channel.
+[nextlevelbuilder/goclaw](https://github.com/nextlevelbuilder/goclaw) — app  
+This repo — portable packaging / updates only

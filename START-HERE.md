@@ -1,17 +1,12 @@
 # Start here
 
+Portable **GoClaw Lite** for **Arch Linux** and **CachyOS** (AppImage, SQLite).
+
 ## English
 
-### Portable GoClaw Lite for Arch & CachyOS
+### Option A — Portable download
 
-This project gives you a **portable AppImage** of **GoClaw Lite** (official SQLite desktop edition) aimed at **Arch Linux** and **CachyOS**.
-
-Upstream app: [nextlevelbuilder/goclaw](https://github.com/nextlevelbuilder/goclaw)  
-This repo: packaging only (not an official release).
-
-### Option A — Download portable AppImage
-
-1. Open [Releases → v0.1.0-cachyos](https://github.com/reclaw17/goclaw-lite-cachyos/releases/tag/v0.1.0-cachyos)
+1. [Releases → v0.1.0-cachyos](https://github.com/reclaw17/goclaw-lite-cachyos/releases/tag/v0.1.0-cachyos)
 2. Download **GoClaw-Lite-x86_64.AppImage**
 3. Run:
 
@@ -20,13 +15,14 @@ chmod +x GoClaw-Lite-x86_64.AppImage
 ./GoClaw-Lite-x86_64.AppImage
 ```
 
-Copy the same file to a **USB stick** and run it on another Arch/CachyOS PC.
-
-If FUSE fails:
+### Update later
 
 ```bash
-./GoClaw-Lite-x86_64.AppImage --appimage-extract-and-run
+cd goclaw-lite-cachyos   # or the folder where update.sh lives
+bash update.sh
 ```
+
+See [docs/UPDATE.md](docs/UPDATE.md).
 
 ### Option B — Build on Arch / CachyOS
 
@@ -36,54 +32,25 @@ cd goclaw-lite-cachyos
 bash setup-all.sh
 ```
 
-Language prompt (**default = English**):
-
-```text
-  1) English   (default)
-  2) Русский
-```
-
-```bash
-LANG_UI=en bash setup-all.sh   # English (default)
-LANG_UI=ru bash setup-all.sh   # Russian messages
-bash build.sh                  # interactive (optional AppImage step)
-```
-
-Result: `dist/GoClaw-Lite-x86_64.AppImage` — portable for Arch/CachyOS.
+Language menu default: **English**. Russian: choose `2` or `LANG_UI=ru`.
 
 ---
 
 ## Русский
 
-### Портативный GoClaw Lite для Arch и CachyOS
+### Скачать
 
-Один **AppImage** официального **GoClaw Lite** (SQLite), заточенный под **Arch Linux** и **CachyOS**.
+[Релиз](https://github.com/reclaw17/goclaw-lite-cachyos/releases/tag/v0.1.0-cachyos) → `GoClaw-Lite-x86_64.AppImage`
 
-### Вариант A — скачать
-
-1. [Releases → v0.1.0-cachyos](https://github.com/reclaw17/goclaw-lite-cachyos/releases/tag/v0.1.0-cachyos)
-2. **GoClaw-Lite-x86_64.AppImage**
-3. Запуск:
+### Обновить
 
 ```bash
-chmod +x GoClaw-Lite-x86_64.AppImage
-./GoClaw-Lite-x86_64.AppImage
+bash update.sh
+LANG_UI=ru bash update.sh
 ```
 
-Можно положить на **флешку** и запускать на других Arch/CachyOS.
-
-### Вариант B — собрать
+### Собрать
 
 ```bash
-git clone https://github.com/reclaw17/goclaw-lite-cachyos.git
-cd goclaw-lite-cachyos
 bash setup-all.sh
 ```
-
-Язык скриптов **по умолчанию English**. Русский:
-
-```bash
-LANG_UI=ru bash setup-all.sh
-```
-
-Результат: `dist/GoClaw-Lite-x86_64.AppImage`.
