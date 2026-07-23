@@ -1,58 +1,85 @@
-# Auto-update
+# Update system
 
-## English
+Quality design has **three layers**.
 
-Portable AppImage updates are fetched from **GitHub Releases** of this repository.
-
-### Update now
+## Layer 1 — End users (portable USB / AppImage)
 
 ```bash
 bash update.sh
-```
-
-What it does:
-
-1. Reads `https://api.github.com/repos/reclaw17/goclaw-lite-cachyos/releases/latest`
-2. Compares tag with local `dist/.goclaw-lite-version` (or next to the AppImage)
-3. If newer — downloads `GoClaw-Lite-x86_64.AppImage`
-4. Keeps a `.bak-TIMESTAMP` copy of the previous file
-5. Marks the new version in `.goclaw-lite-version`
-
-Default UI language: **English**. Russian:
-
-```bash
+# Russian messages:
 LANG_UI=ru bash update.sh
 ```
 
-### After a manual download
+| Does | Does **not** |
+|------|----------------|
+| Checks **this repo** GitHub Releases | Watch upstream GoClaw git by itself |
+| Downloads newer `GoClaw-Lite-x86_64.AppImage` | Rebuild from source |
+| Backs up previous file as `.bak-TIMESTAMP` | Need pacman / Go / Wails |
 
-If you downloaded the AppImage by hand, create a stamp so the updater knows the version:
-
-```bash
-echo 'v0.1.0-cachyos' > dist/.goclaw-lite-version
-# or next to the AppImage file
-```
-
-After building from source you can stamp with:
-
-```bash
-bash scripts/write-version-stamp.sh v0.1.0-cachyos
-```
-
-### Limits
-
-- Updates **this packaging repo’s AppImage**, not upstream GoClaw git tags by themselves
-- Needs network access to GitHub
-- Does not patch a running process — close the app, run `update.sh`, start again
+Stamp file: `dist/.goclaw-lite-version` (+ optional `dist/VERSION.json`).
 
 ---
 
-## Русский
+## Layer 2 — Maintainers on CachyOS / Arch (rebuild from upstream)
+
+When **official** [nextlevelbuilder/goclaw](https://github.com/nextlevelbuilder/goclaw) moves ahead:
 
 ```bash
-bash update.sh
-# или
-LANG_UI=ru bash update.sh
+# only check
+bash scripts/check-upstream.sh
+echo $?
+# 0 = up to date, 2 = rebuild recommended
+
+# rebuild AppImage from latest upstream dev
+bash scripts/rebuild-from-upstream.sh
+
+# force rebuild even if SHA matches
+FORCE=1 bash scripts/rebuild-from-upstream.sh
 ```
 
-Скрипт сверяет тег latest-релиза с `.goclaw-lite-version` и при необходимости скачивает новый AppImage (со старым `.bak-...`).
+Flow:
+
+1. `check-upstream.sh` compares `dist/VERSION.json` → remote `dev` commit
+2. `clone-upstream.sh` refreshes sources
+3. `build-lite.sh` + `package-appimage.sh`
+4. `write-version-stamp.sh` writes packaging tag + upstream SHA
+
+Then **publish** a GitHub Release so Layer 1 users receive it:
+
+```bash
+gh release create lite-<sha>-<date> dist/GoClaw-Lite-x86_64.AppImage \
+  --title "GoClaw Lite <tag>" \
+  --notes "Rebuilt from upstream commit <sha>"
+```
+
+---
+
+## Layer 3 — CI watch (notification)
+
+Workflow `.github/workflows/watch-upstream.yml`:
+
+- runs on a schedule + manual dispatch
+- fetches latest upstream commit
+- uploads `upstream-status.json` artifact
+- does **not** promise a full AppImage on Ubuntu (WebKit/Wails is fragile in CI)
+- real portable builds stay on **CachyOS/Arch** (`rebuild-from-upstream.sh`) or a successful local package job
+
+---
+
+## Recommended maintainer loop
+
+```text
+weekly / when needed
+  → bash scripts/check-upstream.sh
+  → if exit 2: bash scripts/rebuild-from-upstream.sh
+  → gh release create ...
+  → users run: bash update.sh
+```
+
+---
+
+## Русский (кратко)
+
+- **Пользователь флешки:** `bash update.sh` — качает готовый AppImage из **наших** Releases.
+- **Новая версия в официальном GoClaw:** на CachyOS `bash scripts/rebuild-from-upstream.sh`, потом выложить Release.
+- **CI** только **проверяет** upstream; полноценная сборка AppImage — на Arch/CachyOS.

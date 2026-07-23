@@ -1,0 +1,49 @@
+name: Watch upstream GoClaw
+
+on:
+  schedule:
+    # Twice a week
+    - cron: '0 6 * * 1,4'
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check upstream commit
+        id: up
+        run: |
+          chmod +x scripts/check-upstream.sh || true
+          set +e
+          bash scripts/check-upstream.sh
+          code=$?
+          set -e
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          if [[ -f dist/upstream-status.json ]]; then
+            cat dist/upstream-status.json
+            remote=$(python3 -c 'import json;print(json.load(open("dist/upstream-status.json")).get("remote_sha","")[:12])')
+            reason=$(python3 -c 'import json;print(json.load(open("dist/upstream-status.json")).get("reason",""))')
+            echo "remote_sha=$remote" >> "$GITHUB_OUTPUT"
+            echo "reason=$reason" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload upstream status
+        uses: actions/upload-artifact@v4
+        with:
+          name: upstream-status
+          path: dist/upstream-status.json
+          if-no-files-found: warn
+
+      - name: Summary
+        run: |
+          echo "### Upstream GoClaw check" >> "$GITHUB_STEP_SUMMARY"
+          echo "- reason: ${{ steps.up.outputs.reason }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- remote: ${{ steps.up.outputs.remote_sha }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- script exit: ${{ steps.up.outputs.exit_code }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "If update is available, rebuild on CachyOS/Arch:" >> "$GITHUB_STEP_SUMMARY"
+          echo "\`bash scripts/rebuild-from-upstream.sh\`" >> "$GITHUB_STEP_SUMMARY"
