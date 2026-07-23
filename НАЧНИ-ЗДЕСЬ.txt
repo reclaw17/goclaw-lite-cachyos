@@ -1,1 +1,2 @@
-Moved to START-HERE.md
+DEPRECATED — use START-HERE.md
+This file will be removed.
