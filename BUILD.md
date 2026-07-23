@@ -1,54 +1,35 @@
-# Build guide
+# Build — portable GoClaw Lite (Arch / CachyOS)
 
-## English
+## Goal
 
-### Language
+Produce a **portable AppImage** of **GoClaw Lite** optimized for **Arch Linux** and **CachyOS**.
 
-`setup-all.sh` and `build.sh` ask for UI language at start.
-
-- **Default: English (1)**
-- Russian: choose `2` or set `LANG_UI=ru`
-
-```bash
-LANG_UI=en bash setup-all.sh   # default
-LANG_UI=ru bash setup-all.sh
+```text
+dist/GoClaw-Lite-x86_64.AppImage
 ```
 
-`LANG_UI` is exported to `scripts/*` so dependency/build messages match.
-
-### One-shot
+## One command
 
 ```bash
 bash setup-all.sh
 ```
 
-### Interactive
+Language (**default English**):
 
 ```bash
-bash build.sh
-```
-
-### Steps
-
-```bash
-bash scripts/install-deps-cachyos.sh
-bash scripts/clone-upstream.sh
-bash scripts/build-lite.sh
-bash scripts/package-appimage.sh
-```
-
-Upstream GoClaw is cloned into `upstream/` at build time.
-
-WebKit on CachyOS/Arch: [docs/FIX-WEBKIT.md](docs/FIX-WEBKIT.md)
-
----
-
-## Русский
-
-Язык по умолчанию — **английский**. Русский:
-
-```bash
+LANG_UI=en bash setup-all.sh
 LANG_UI=ru bash setup-all.sh
 ```
 
-Или пункт **2** в меню при запуске.
+## Steps
+
+1. `scripts/install-deps-cachyos.sh` — pacman deps (`webkit2gtk-4.1`, gtk3, go, pnpm, wails…)
+2. `scripts/clone-upstream.sh` — official [goclaw](https://github.com/nextlevelbuilder/goclaw) sources
+3. `scripts/build-lite.sh` — `wails build -tags sqliteonly,webkit2_41`
+4. `scripts/package-appimage.sh` — portable AppImage
+
+## Notes
+
+- No PostgreSQL
+- WebKit 4.1 only on modern Arch/CachyOS → tag `webkit2_41` (see [docs/FIX-WEBKIT.md](docs/FIX-WEBKIT.md))
+- AppImage is the portable artifact for USB / other machines

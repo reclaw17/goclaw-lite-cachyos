@@ -5,16 +5,15 @@
 <h1 align="center">goclaw-lite-cachyos</h1>
 
 <p align="center">
-  <strong>Portable GoClaw Lite for <em>Arch Linux</em> & <em>CachyOS</em></strong><br/>
-  Unofficial AppImage of <a href="https://github.com/nextlevelbuilder/goclaw">GoClaw Lite</a> · SQLite · no PostgreSQL · USB-friendly
+  <strong>Portable GoClaw Lite for <em>Arch Linux</em> &amp; <em>CachyOS</em></strong><br/>
+  Unofficial AppImage · SQLite · no PostgreSQL · USB-friendly
 </p>
 
 <p align="center">
   <a href="https://github.com/reclaw17/goclaw-lite-cachyos/releases/tag/v0.1.0-cachyos"><img alt="Release" src="https://img.shields.io/badge/release-v0.1.0--cachyos-blue?style=flat-square"></a>
-  <a href="https://github.com/nextlevelbuilder/goclaw"><img alt="Upstream" src="https://img.shields.io/badge/upstream-nextlevelbuilder%2Fgoclaw-orange?style=flat-square"></a>
-  <img alt="Portable" src="https://img.shields.io/badge/portable-AppImage-brightgreen?style=flat-square">
-  <img alt="Arch" src="https://img.shields.io/badge/Arch-supported-1793D1?style=flat-square&logo=archlinux&logoColor=white">
-  <img alt="CachyOS" src="https://img.shields.io/badge/CachyOS-supported-green?style=flat-square">
+  <a href="https://github.com/nextlevelbuilder/goclaw"><img alt="Upstream" src="https://img.shields.io/badge/upstream-GoClaw%20Lite-orange?style=flat-square"></a>
+  <img alt="Portable" src="https://img.shields.io/badge/portable-AppImage-purple?style=flat-square">
+  <img alt="Distro" src="https://img.shields.io/badge/distro-Arch%20%7C%20CachyOS-green?style=flat-square">
   <a href="#russian"><img alt="RU" src="https://img.shields.io/badge/lang-EN%20%7C%20RU-lightgrey?style=flat-square"></a>
 </p>
 
@@ -24,55 +23,51 @@
 
 ### What is this?
 
-A **portable** build of **[GoClaw Lite](https://github.com/nextlevelbuilder/goclaw)** made for **Arch Linux** and **CachyOS**.
+**Your portable GoClaw Lite** for **Arch Linux** and **CachyOS**.
 
-One AppImage file → copy to a USB stick or any folder → run. No PostgreSQL, no Docker, no system-wide install required for the app itself.
+This project takes the official **[GoClaw Lite](https://github.com/nextlevelbuilder/goclaw)** desktop edition (SQLite, no PostgreSQL) and packages it as a **single portable AppImage** you can:
+
+- download and run
+- put on a **USB stick**
+- use on Arch / CachyOS (and similar x86_64 Linux)
 
 | | Upstream Standard | **This project (portable Lite)** |
 |--|-------------------|----------------------------------|
-| Target OS | multi-platform server | **Arch / CachyOS** (Linux x86_64) |
 | Database | PostgreSQL | **SQLite** |
 | Form | Server / gateway | **Desktop AppImage** |
-| Portability | needs infra | **single file, USB-ready** |
+| Target | General / infra | **Arch + CachyOS first** |
+| Carry on USB | Hard | **One file** |
 
-- **Upstream:** [nextlevelbuilder/goclaw](https://github.com/nextlevelbuilder/goclaw) (Lite / `sqliteonly`)
-- **This repo:** community packaging + build scripts for Arch & CachyOS
-- **Not affiliated** with upstream authors
+**Upstream source of truth:** [nextlevelbuilder/goclaw](https://github.com/nextlevelbuilder/goclaw)  
+**This repo:** community packaging + build scripts — **not an official release channel**.
 
 ### Why Arch & CachyOS?
 
-Official GoClaw Lite focuses on macOS / Windows desktop builds.  
-This project fills the gap for **Arch-based systems**:
+Official Lite ships mainly for macOS / Windows.  
+Here we focus on **Arch-family Linux**:
 
-- builds with `webkit2gtk-4.1` + tag `webkit2_41`
-- scripts tuned for `pacman` / CachyOS
-- ships a ready **AppImage** for portable use
+- correct **WebKit 4.1** build tags (`webkit2_41`)
+- pacman-based dependency scripts
+- tested path to a **portable AppImage**
 
-### Quick start (portable)
+### Quick start — portable download
 
-1. Download from **[Releases · v0.1.0-cachyos](https://github.com/reclaw17/goclaw-lite-cachyos/releases/tag/v0.1.0-cachyos)**
-2. Get `GoClaw-Lite-x86_64.AppImage`
-3. Run (or put on a USB stick first):
+1. Release: **[v0.1.0-cachyos](https://github.com/reclaw17/goclaw-lite-cachyos/releases/tag/v0.1.0-cachyos)**
+2. Download **`GoClaw-Lite-x86_64.AppImage`**
+3. Run:
 
 ```bash
 chmod +x GoClaw-Lite-x86_64.AppImage
 ./GoClaw-Lite-x86_64.AppImage
 ```
 
-If FUSE is missing:
+FUSE issues:
 
 ```bash
 ./GoClaw-Lite-x86_64.AppImage --appimage-extract-and-run
 ```
 
-Direct download:
-
-```bash
-curl -L --fail -o GoClaw-Lite-x86_64.AppImage \
-  https://github.com/reclaw17/goclaw-lite-cachyos/releases/download/v0.1.0-cachyos/GoClaw-Lite-x86_64.AppImage
-chmod +x GoClaw-Lite-x86_64.AppImage
-./GoClaw-Lite-x86_64.AppImage
-```
+**USB:** copy that one AppImage to a flash drive and launch on another Arch/CachyOS machine (host may still need WebKit/GTK libs).
 
 ### Build on Arch / CachyOS
 
@@ -84,7 +79,7 @@ cd goclaw-lite-cachyos
 bash setup-all.sh
 ```
 
-**Language at startup** (default **English**):
+Language at startup (**default = English**):
 
 ```text
   1) English   (default)
@@ -96,36 +91,23 @@ LANG_UI=en bash setup-all.sh   # English (default)
 LANG_UI=ru bash setup-all.sh   # Russian script messages
 ```
 
-Result:
+Result: `dist/GoClaw-Lite-x86_64.AppImage`
 
-```text
-dist/GoClaw-Lite-x86_64.AppImage   ← portable binary for Arch / CachyOS
-```
+### FAQ (short)
 
-WebKit note: use `webkit2gtk-4.1` + `webkit2_41` — [docs/FIX-WEBKIT.md](docs/FIX-WEBKIT.md).
+**Is this official GoClaw?** No — portable packaging of official **Lite** sources.  
+**PostgreSQL?** Not needed.  
+**Portable / USB?** Yes — one AppImage file.  
+**Only Arch/CachyOS?** Optimized for them; other modern Linux x86_64 may work.  
+**FUSE error?** Use `--appimage-extract-and-run`.  
+**Local models?** Point the setup wizard to an OpenAI-compatible URL (e.g. Fabric).
 
-### Portability notes
-
-- **Yes:** one AppImage, no install step, works from USB/folder
-- **Host still needs:** common GTK/WebKit libraries (present on normal Arch/CachyOS installs)
-- **Best tested on:** CachyOS and Arch Linux x86_64
-- **Not:** a Windows/macOS portable (use upstream Lite there)
-
-### FAQ
-
-**Is this official GoClaw?** No — community portable packaging of official **Lite** sources.  
-**PostgreSQL?** Not required.  
-**Only Arch/CachyOS?** Built and tested for them; other Linux x86_64 may work if libraries match.  
-**USB?** Copy the single AppImage.  
-**FUSE error?** `--appimage-extract-and-run`.  
-**Local models?** Point the wizard to an OpenAI-compatible URL (e.g. Fabric).
+Full FAQ lives in README history / docs as needed.
 
 ### Credits
 
-- **GoClaw** — [nextlevelbuilder/goclaw](https://github.com/nextlevelbuilder/goclaw)
-- **Portable Arch/CachyOS packaging** — this repository
-
-Please support upstream: https://github.com/nextlevelbuilder/goclaw
+- App: [nextlevelbuilder/goclaw](https://github.com/nextlevelbuilder/goclaw)
+- Portable Arch/CachyOS packaging: this repository
 
 ### License
 
@@ -134,26 +116,30 @@ Scripts: MIT · GoClaw application: upstream license
 ---
 
 <a id="russian"></a>
+
 ## Russian
 
 ### Что это?
 
-**Портативная** сборка **[GoClaw Lite](https://github.com/nextlevelbuilder/goclaw)** для **Arch Linux** и **CachyOS**.
+**Портативный GoClaw Lite для Arch Linux и CachyOS.**
 
-Один файл AppImage → на флешку или в папку → запуск. Без PostgreSQL, без Docker, без установки в систему.
+Официальный **[GoClaw Lite](https://github.com/nextlevelbuilder/goclaw)** (desktop, SQLite, без PostgreSQL) собран в **один AppImage**, который можно:
 
-| | Standard (upstream) | **Эта версия (portable Lite)** |
-|--|---------------------|--------------------------------|
-| Система | сервер / multi-platform | **Arch / CachyOS** |
+- скачать и запустить
+- положить на **флешку**
+- использовать на Arch / CachyOS
+
+| | Standard | **Эта версия** |
+|--|----------|----------------|
 | База | PostgreSQL | **SQLite** |
-| Формат | сервер | **Desktop AppImage** |
-| Портативность | нужна инфраструктура | **один файл, с флешки** |
+| Форма | Сервер | **Portable AppImage** |
+| Фокус | Общий | **Arch + CachyOS** |
 
-### Быстрый запуск
+Репозиторий **неофициальный** — только упаковка. Оригинал: [nextlevelbuilder/goclaw](https://github.com/nextlevelbuilder/goclaw).
 
-1. Релиз: **[v0.1.0-cachyos](https://github.com/reclaw17/goclaw-lite-cachyos/releases/tag/v0.1.0-cachyos)**
-2. Скачай `GoClaw-Lite-x86_64.AppImage`
-3. Запусти (можно с флешки):
+### Скачать портативную версию
+
+**[v0.1.0-cachyos](https://github.com/reclaw17/goclaw-lite-cachyos/releases/tag/v0.1.0-cachyos)** → `GoClaw-Lite-x86_64.AppImage`
 
 ```bash
 chmod +x GoClaw-Lite-x86_64.AppImage
@@ -163,17 +149,9 @@ chmod +x GoClaw-Lite-x86_64.AppImage
 ### Сборка на Arch / CachyOS
 
 ```bash
-git clone https://github.com/reclaw17/goclaw-lite-cachyos.git
-cd goclaw-lite-cachyos
 bash setup-all.sh
-```
-
-Язык сообщений скриптов по умолчанию — **английский**:
-
-```bash
+# язык скриптов по умолчанию — английский
 LANG_UI=ru bash setup-all.sh   # русский
 ```
-
-Итог: `dist/GoClaw-Lite-x86_64.AppImage` — портативный файл под Arch и CachyOS.
 
 Подробнее: [START-HERE.md](START-HERE.md), [BUILD.md](BUILD.md).
