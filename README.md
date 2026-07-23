@@ -1,41 +1,18 @@
 # goclaw-lite-cachyos
 
-Сборка **GoClaw Lite** для CachyOS/Arch и упаковка в **AppImage** (запуск с флешки).
+**GoClaw Lite** для CachyOS / Arch — в формате, удобном новичку.
 
-**Опыт программиста не обязателен.**
+Сначала открой:
 
----
-
-## Ссылка
-
-https://github.com/reclaw17/goclaw-lite-cachyos
+**[НАЧНИ-ЗДЕСЬ.md](НАЧНИ-ЗДЕСЬ.md)**
 
 ---
 
-## Для новичка
+## Самый простой путь
 
-Открой файл **[НАЧНИ-ЗДЕСЬ.txt](НАЧНИ-ЗДЕСЬ.txt)**
-
-Коротко:
-
-1. Скачай ZIP с GitHub (**Code → Download ZIP**) или сделай `git clone`
-2. Открой терминал в папке проекта
-3. Выполни по очереди:
-
-```bash
-bash scripts/install-deps-cachyos.sh
-bash scripts/clone-upstream.sh
-bash scripts/build-lite.sh
-bash scripts/package-appimage.sh
-```
-
-4. Возьми файл:
-
-```text
-dist/GoClaw-Lite-x86_64.AppImage
-```
-
-5. На флешке:
+1. https://github.com/reclaw17/goclaw-lite-cachyos/releases  
+2. Скачать `GoClaw-Lite-x86_64.AppImage`  
+3. Запустить:
 
 ```bash
 chmod +x GoClaw-Lite-x86_64.AppImage
@@ -44,28 +21,29 @@ chmod +x GoClaw-Lite-x86_64.AppImage
 
 ---
 
-## Зачем это
+## Если релиза ещё нет — одна команда сборки
 
-- GoClaw Lite = без PostgreSQL (SQLite)
-- AppImage = “всё с собой”, как portable на Windows
-- Зависимости ставятся только на ПК сборки
+```bash
+git clone https://github.com/reclaw17/goclaw-lite-cachyos.git
+cd goclaw-lite-cachyos
+bash всё-сразу.sh
+```
 
----
-
-## Если что-то сломалось
-
-Пришли текст ошибки из терминала. Не нужно всё удалять.
+Или: **Code → Download ZIP** на GitHub, распаковать, затем `bash всё-сразу.sh`.
 
 ---
 
-## Запасной путь
+## Что это
 
-CLI / тонкий harness — см. `docs/CLI-FALLBACK.md`
+- GoClaw **Lite** = SQLite, без PostgreSQL
+- Цель = AppImage на флешку
+- CLI-вариант = запасной (см. `docs/CLI-FALLBACK.md`)
 
-Основной USB-агент: https://github.com/reclaw17/goclaw-setup-my-pc
+Связанный проект агента: https://github.com/reclaw17/goclaw-setup-my-pc
 
 ---
 
-## License
+## Для продвинутых
 
-Скрипты — MIT. GoClaw — лицензия upstream.
+Отдельные шаги: `scripts/install-deps-cachyos.sh`, `clone-upstream.sh`, `build-lite.sh`, `package-appimage.sh`  
+Подробности: `BUILD.md`, `docs/APPIMAGE.md`

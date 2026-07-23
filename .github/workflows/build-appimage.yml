@@ -1,0 +1,67 @@
+name: Build AppImage
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/**'
+      - '.github/workflows/build-appimage.yml'
+      - 'всё-сразу.sh'
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install OS deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libgtk-3-dev libwebkit2gtk-4.1-dev \
+            build-essential curl git \
+            libnss3 libxss1
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26.x'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install pnpm + wails
+        run: |
+          npm install -g pnpm
+          go install github.com/wailsapp/wails/v2/cmd/wails@latest
+          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+
+      - name: Clone upstream + build + package
+        run: |
+          chmod +x scripts/*.sh всё-сразу.sh || true
+          bash scripts/clone-upstream.sh
+          bash scripts/build-lite.sh
+          bash scripts/package-appimage.sh
+
+      - name: Upload AppImage artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: GoClaw-Lite-AppImage
+          path: dist/*.AppImage
+          if-no-files-found: warn
+
+      - name: Publish draft release on manual run
+        if: github.event_name == 'workflow_dispatch' && success()
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: lite-experimental-${{ github.run_number }}
+          name: GoClaw Lite experimental ${{ github.run_number }}
+          draft: true
+          files: dist/*.AppImage
+          body: |
+            Experimental Linux AppImage (not official upstream).
+            Download, chmod +x, run.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
