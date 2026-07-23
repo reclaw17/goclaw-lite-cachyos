@@ -1,68 +1,30 @@
-# Сборка GoClaw Lite на CachyOS / Arch
+# Build + AppImage
 
-## Требования
+## На машине сборки (CachyOS / Arch)
 
-- CachyOS или Arch Linux
-- интернет
-- ~5–10 ГБ свободного места на время сборки
-- обычные права пользователя + `sudo` для пакетов
-
-## Зависимости (ключевые)
-
-- `go`
-- `nodejs` + `pnpm`
-- `wails` (CLI)
-- WebKit/GTK для Wails на Linux:
-  - `webkit2gtk-4.1` (или актуальный пакет в репо)
-  - `gtk3`
-  - `gcc` / base-devel
-
-Точный список ставит:
 ```bash
+git clone https://github.com/reclaw17/goclaw-lite-cachyos.git
+cd goclaw-lite-cachyos
+
 bash scripts/install-deps-cachyos.sh
-```
-
-## Upstream
-
-Клонируем официальный репозиторий:
-```bash
 bash scripts/clone-upstream.sh
-```
-
-По умолчанию ветка: `dev` (активная разработка upstream).
-
-## Команда сборки Lite
-
-В upstream Makefile:
-```make
-desktop-build:
-	cd ui/desktop && wails build -tags sqliteonly ...
-```
-
-Наш скрипт:
-```bash
 bash scripts/build-lite.sh
+bash scripts/package-appimage.sh
 ```
 
-## Что должно получиться
-
-Каталог:
+Артефакт:
 ```text
-upstream/ui/desktop/build/bin/
+dist/GoClaw-Lite-x86_64.AppImage
 ```
 
-Там desktop-приложение GoClaw Lite (sqliteonly).
+## На флешке / другом ПК
 
-## Известные риски
+```bash
+chmod +x GoClaw-Lite-x86_64.AppImage
+./GoClaw-Lite-x86_64.AppImage
+```
 
-1. Upstream CI для Lite сейчас ориентирован на macOS/Windows
-2. Linux desktop может потребовать ручных правок
-3. Portable USB ≠ просто скопировать GUI-бинарник (нужны libs / проверка)
-4. Версии webkit2gtk на Arch иногда ломают Wails — фиксим по факту ошибки
-
-## После успешной сборки
-
-1. Зафиксировать версию upstream commit в `STATUS.md`
-2. Проверить запуск на той же машине
-3. Проверить копирование на флешку и запуск на другой Arch/CachyOS машине
-4. Связать с `goclaw-setup-my-pc` как optional runtime
+Если FUSE ругается:
+```bash
+./GoClaw-Lite-x86_64.AppImage --appimage-extract-and-run
+```

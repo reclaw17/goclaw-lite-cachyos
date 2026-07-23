@@ -1,36 +1,23 @@
-# Status — goclaw-lite-cachyos
+# STATUS
 
-**Created:** 2026-07-23  
-**Goal:** Build GoClaw Lite (sqliteonly) for CachyOS / Arch Linux
+**Date:** 2026-07-23
 
-## Current
+## Decision
 
-| Item | Status |
-|------|--------|
-| Repo created | Done |
-| Build docs | Done |
-| Deps install script | Done |
-| Upstream clone script | Done |
-| Build script | Done |
-| First successful Linux Lite binary | Pending |
-| Portable USB packaging | Pending |
-| Link into goclaw-setup-my-pc | Pending |
+Primary path: **build GoClaw Lite on CachyOS → package AppImage → run from USB**
 
-## Upstream notes
+CLI harness / console coding agents = fallback.
 
-- Lite = `-tags sqliteonly`
-- Desktop UI: Wails (`ui/desktop`)
-- Official desktop CI: macOS + Windows
-- Linux: build manually via Wails
+## Done
 
-## Next action
+- Repo scaffold
+- install-deps / clone-upstream / build-lite scripts
+- `scripts/package-appimage.sh`
+- docs: APPIMAGE, CLI-FALLBACK
 
-On a CachyOS machine run:
+## Next
 
-```bash
-bash scripts/install-deps-cachyos.sh
-bash scripts/clone-upstream.sh
-bash scripts/build-lite.sh
-```
-
-Then report the build log.
+1. User runs build on CachyOS
+2. Fix build errors if any
+3. Produce first AppImage
+4. Test AppImage on clean Linux host / USB

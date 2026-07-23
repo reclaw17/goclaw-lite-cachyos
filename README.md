@@ -1,99 +1,93 @@
 # goclaw-lite-cachyos
 
-Сборка **GoClaw Lite** (sqliteonly, без PostgreSQL) под **CachyOS / Arch Linux**.
+Сборка **GoClaw Lite** (SQLite, без PostgreSQL) для **CachyOS / Arch Linux**  
+и упаковка в **AppImage** для запуска с флешки.
 
-Отдельный репозиторий специально для portable/desktop-варианта GoClaw.
-
----
-
-## Зачем этот репо
-
-Официальный GoClaw Lite сейчас собирается в CI в основном под **macOS и Windows**.  
-Linux desktop/lite официально не отдают готовым билдом.
-
-Этот репозиторий:
-1. фиксирует, **как собрать Lite на CachyOS/Arch**
-2. готовит скрипты зависимостей и сборки
-3. позже — упаковку под флешку / локальный запуск
-
-Связанный проект агента: https://github.com/reclaw17/goclaw-setup-my-pc
+Связанный USB-агент: [goclaw-setup-my-pc](https://github.com/reclaw17/goclaw-setup-my-pc)
 
 ---
 
-## Что такое GoClaw Lite
+## Цель
+
+```text
+Сборка на CachyOS  →  AppImage  →  флешка  →  запуск на Linux без pacman
+```
+
+Как portable-программы на Windows: **максимум “всё с собой”**.
+
+---
+
+## Путь пользователя
+
+### A) Основной: GUI Lite через AppImage
+
+```bash
+# один раз на машине сборки (CachyOS/Arch)
+bash scripts/install-deps-cachyos.sh
+bash scripts/clone-upstream.sh
+bash scripts/build-lite.sh
+bash scripts/package-appimage.sh
+```
+
+Результат:
+```text
+dist/GoClaw-Lite-x86_64.AppImage
+```
+
+На флешку копируешь **этот файл** (и при желании `models/`, `.env`).
+
+Запуск:
+```bash
+chmod +x GoClaw-Lite-x86_64.AppImage
+./GoClaw-Lite-x86_64.AppImage
+```
+
+### B) Запасной: CLI
+
+Если GUI/AppImage не зайдёт — CLI-путь (тонкий harness / готовые console coding agents).  
+См. `docs/CLI-FALLBACK.md`.
+
+---
+
+## Что такое Lite
 
 | | Standard | Lite |
 |--|----------|------|
 | База | PostgreSQL | **SQLite** |
-| Docker | часто нужен | **не нужен** |
-| Цель | сервер | desktop / local |
-| UI | web dashboard | native (Wails) |
+| Docker | часто нужен | не нужен |
+| UI | web/server | Wails desktop |
 
-Источник upstream: https://github.com/nextlevelbuilder/goclaw
-
-Сборка Lite идёт с тегом:
-```bash
--tags sqliteonly
-```
+Upstream: https://github.com/nextlevelbuilder/goclaw  
+Сборка: `wails build -tags sqliteonly`
 
 ---
 
-## Быстрый путь (CachyOS / Arch)
-
-### 1. Поставить зависимости
-```bash
-bash scripts/install-deps-cachyos.sh
-```
-
-### 2. Склонировать upstream GoClaw
-```bash
-bash scripts/clone-upstream.sh
-```
-
-### 3. Собрать Lite
-```bash
-bash scripts/build-lite.sh
-```
-
-Готовый бинарник/приложение появится в:
-```text
-upstream/ui/desktop/build/bin/
-```
-
----
-
-## Структура репо
+## Структура
 
 ```text
-goclaw-lite-cachyos/
-├── README.md
-├── BUILD.md
-├── STATUS.md
-├── scripts/
-│   ├── install-deps-cachyos.sh
-│   ├── clone-upstream.sh
-│   └── build-lite.sh
-└── packaging/          # позже: portable layout для USB
+scripts/
+  install-deps-cachyos.sh   # только для СБОРКИ
+  clone-upstream.sh
+  build-lite.sh
+  package-appimage.sh       # упаковка для флешки
+docs/
+  BUILD-CACHYOS.md
+  APPIMAGE.md
+  CLI-FALLBACK.md
+dist/                       # артефакты (не в git)
 ```
-
----
-
-## Статус
-
-См. `STATUS.md`
 
 ---
 
 ## Важно
 
-- Это **не** серверный GoClaw с PostgreSQL
-- Это путь к **Lite / sqliteonly** под Linux
-- Переносимость «одной флешки на любой ПК» после сборки нужно проверять отдельно
-- Пользователь без опыта разработки: шаги максимально скриптованы
+1. `install-deps` нужен **только на ПК, где собираешь**
+2. На целевых машинах зависимости через pacman ставить **не нужно** (цель AppImage)
+3. Linux Lite — экспериментальный путь, upstream официально Linux desktop не отдаёт
+4. AppImage может быть большим (WebKit/GTK внутри)
 
 ---
 
-## Лицензия
+## License
 
-Скрипты этого репо — MIT.  
-GoClaw upstream — своя лицензия upstream-проекта.
+Скрипты репо — MIT. Код GoClaw — лицензия upstream.
