@@ -25,20 +25,19 @@
 
 This repository packages **[GoClaw Lite](https://github.com/nextlevelbuilder/goclaw)** (the official desktop / SQLite edition) as a **portable Linux AppImage**.
 
-- **Upstream project:** [nextlevelbuilder/goclaw](https://github.com/nextlevelbuilder/goclaw)
-- **Edition:** Lite (`sqliteonly`) — local SQLite, no PostgreSQL
-- **Target:** CachyOS / Arch Linux (and similar x86_64 Linux)
-- **Not affiliated** with upstream authors — build scripts + community AppImage only
+- **Upstream:** [nextlevelbuilder/goclaw](https://github.com/nextlevelbuilder/goclaw)
+- **Edition:** Lite (`sqliteonly`) — SQLite, no PostgreSQL
+- **Target:** CachyOS / Arch (and similar x86_64 Linux)
+- **Not affiliated** with upstream — community packaging only
 
-| | GoClaw Standard | GoClaw Lite (this build) |
-|--|-----------------|---------------------------|
+| | Standard | Lite (this build) |
+|--|----------|-------------------|
 | Database | PostgreSQL | **SQLite** |
-| Form factor | Server / gateway | **Desktop (Wails)** |
-| Typical setup | Docker / infra | AppImage / local binary |
+| Form | Server | **Desktop (Wails)** |
 
 ### Quick start (download)
 
-1. Open **[v0.1.0-cachyos](https://github.com/reclaw17/goclaw-lite-cachyos/releases/tag/v0.1.0-cachyos)**
+1. **[v0.1.0-cachyos](https://github.com/reclaw17/goclaw-lite-cachyos/releases/tag/v0.1.0-cachyos)**
 2. Download `GoClaw-Lite-x86_64.AppImage`
 3. Run:
 
@@ -47,22 +46,11 @@ chmod +x GoClaw-Lite-x86_64.AppImage
 ./GoClaw-Lite-x86_64.AppImage
 ```
 
-FUSE issues:
+FUSE: `./GoClaw-Lite-x86_64.AppImage --appimage-extract-and-run`
 
-```bash
-./GoClaw-Lite-x86_64.AppImage --appimage-extract-and-run
-```
+### Build (CachyOS / Arch)
 
-```bash
-curl -L --fail -o GoClaw-Lite-x86_64.AppImage \
-  https://github.com/reclaw17/goclaw-lite-cachyos/releases/download/v0.1.0-cachyos/GoClaw-Lite-x86_64.AppImage
-chmod +x GoClaw-Lite-x86_64.AppImage
-./GoClaw-Lite-x86_64.AppImage
-```
-
-### Build from source (CachyOS / Arch)
-
-Beginner guide: **[START-HERE.md](START-HERE.md)**
+Guide: **[START-HERE.md](START-HERE.md)** · details: **[BUILD.md](BUILD.md)**
 
 ```bash
 git clone https://github.com/reclaw17/goclaw-lite-cachyos.git
@@ -70,81 +58,53 @@ cd goclaw-lite-cachyos
 bash setup-all.sh
 ```
 
-Interactive variant:
+**Language at startup** (default **English**):
 
-```bash
-bash build.sh
+```text
+  1) English   (default)
+  2) Русский
 ```
 
-Step by step:
-
 ```bash
-bash scripts/install-deps-cachyos.sh
-bash scripts/clone-upstream.sh
-bash scripts/build-lite.sh
-bash scripts/package-appimage.sh
+LANG_UI=en bash setup-all.sh   # English (default)
+LANG_UI=ru bash setup-all.sh   # Russian UI messages
+bash build.sh                  # interactive (optional AppImage step)
 ```
 
 Output: `dist/GoClaw-Lite-x86_64.AppImage`
 
-**WebKit:** use `webkit2gtk-4.1` + `-tags sqliteonly,webkit2_41` (scripts detect this).  
-See [docs/FIX-WEBKIT.md](docs/FIX-WEBKIT.md).
+WebKit on CachyOS: `webkit2gtk-4.1` + tag `webkit2_41` — see [docs/FIX-WEBKIT.md](docs/FIX-WEBKIT.md).
 
 ### FAQ
 
-**Official GoClaw?** No — community packaging of official **Lite** sources. Upstream: [nextlevelbuilder/goclaw](https://github.com/nextlevelbuilder/goclaw).
-
-**Lite or Standard?** **Lite** (SQLite desktop). Not the PostgreSQL server edition.
-
-**Need PostgreSQL / Docker?** **No.**
-
-**USB portable?** Copy the AppImage. Host may still need WebKit/GTK libs.
-
-**`webkit2gtk` package missing?** Normal on modern Arch/CachyOS. Install `webkit2gtk-4.1`, use `webkit2_41` tag.
-
-**FUSE error?** `./GoClaw-Lite-x86_64.AppImage --appimage-extract-and-run`
-
-**Local models?** Point the wizard to an OpenAI-compatible URL (e.g. Fabric `http://127.0.0.1:8080/v1`).
+**Official?** No — community packaging of official Lite sources.  
+**PostgreSQL?** Not required.  
+**USB?** Copy the AppImage.  
+**FUSE error?** Use `--appimage-extract-and-run`.  
+**Local models?** Point the wizard to an OpenAI-compatible URL (e.g. Fabric).
 
 ### Credits
 
-- **GoClaw** — [nextlevelbuilder/goclaw](https://github.com/nextlevelbuilder/goclaw)
-- Packaging — this repository
+[nextlevelbuilder/goclaw](https://github.com/nextlevelbuilder/goclaw) · packaging: this repo
 
 ### License
 
-- Scripts: MIT
-- GoClaw app: upstream license
+Scripts: MIT · GoClaw app: upstream license
 
 ---
 
 ## Russian
 
-### Что это?
+Неофициальная сборка **GoClaw Lite** (SQLite) в AppImage для CachyOS/Arch.
 
-Неофициальная сборка **[GoClaw Lite](https://github.com/nextlevelbuilder/goclaw)** (desktop / SQLite) в **AppImage**.
+**Скачать:** [v0.1.0-cachyos](https://github.com/reclaw17/goclaw-lite-cachyos/releases/tag/v0.1.0-cachyos)
 
-### Быстрый запуск
-
-1. [Релиз v0.1.0-cachyos](https://github.com/reclaw17/goclaw-lite-cachyos/releases/tag/v0.1.0-cachyos)
-2. Скачай `GoClaw-Lite-x86_64.AppImage`
-3. `chmod +x GoClaw-Lite-x86_64.AppImage && ./GoClaw-Lite-x86_64.AppImage`
-
-### Сборка
+**Сборка** (язык UI по умолчанию — **английский**):
 
 ```bash
-git clone https://github.com/reclaw17/goclaw-lite-cachyos.git
-cd goclaw-lite-cachyos
 bash setup-all.sh
+# русский интерфейс скриптов:
+LANG_UI=ru bash setup-all.sh
 ```
 
-Гайд: [START-HERE.md](START-HERE.md)
-
-Нужен `webkit2gtk-4.1` (пакета `webkit2gtk` 4.0 нет). Скрипты сами ставят тег `webkit2_41`.
-
-### FAQ (кратко)
-
-- Официальный? **Нет** — community-сборка Lite
-- PostgreSQL? **Не нужен**
-- Флешка? **Да**, копируй AppImage
-- Ошибка WebKit? [docs/FIX-WEBKIT.md](docs/FIX-WEBKIT.md)
+Подробнее: [START-HERE.md](START-HERE.md), [BUILD.md](BUILD.md).

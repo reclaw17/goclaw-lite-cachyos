@@ -8,6 +8,7 @@ APPDIR="$DIST/GoClaw-Lite.AppDir"
 APP_NAME="GoClaw-Lite"
 ARCH="x86_64"
 OUT_APPIMAGE="$DIST/${APP_NAME}-${ARCH}.AppImage"
+LANG_UI="${LANG_UI:-en}"
 
 log() { echo "==> $*"; }
 err() { echo "==> ERROR: $*" >&2; exit 1; }
@@ -15,7 +16,13 @@ err() { echo "==> ERROR: $*" >&2; exit 1; }
 mkdir -p "$DIST"
 
 BIN="$(find "$UPSTREAM/ui/desktop/build" -type f -executable 2>/dev/null | head -n 1 || true)"
-[[ -n "$BIN" && -f "$BIN" ]] || err "Binary not found. Run build-lite.sh first."
+if [[ -z "$BIN" || ! -f "$BIN" ]]; then
+  if [[ "$LANG_UI" == "ru" ]]; then
+    err "Бинарник не найден. Сначала: bash scripts/build-lite.sh"
+  else
+    err "Binary not found. Run build-lite.sh first."
+  fi
+fi
 log "Binary: $BIN"
 
 if command -v appimagetool >/dev/null 2>&1; then
@@ -56,7 +63,6 @@ Terminal=false
 EOF
 cp "$APPDIR/goclaw-lite.desktop" "$APPDIR/usr/share/applications/"
 
-# minimal png placeholder
 printf '\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x02\x00\x00\x00\x90wS\xde\x00\x00\x00\x0cIDATx\x9cc\xf8\x0f\x00\x00\x01\x01\x00\x05\x18\xd8N\x00\x00\x00\x00IEND\xaeB`\x82' \
   > "$APPDIR/goclaw-lite.png"
 cp "$APPDIR/goclaw-lite.png" "$APPDIR/usr/share/icons/hicolor/256x256/apps/goclaw-lite.png"

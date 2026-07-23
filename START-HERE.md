@@ -23,13 +23,27 @@ cd goclaw-lite-cachyos
 bash setup-all.sh
 ```
 
-Result: `dist/GoClaw-Lite-x86_64.AppImage`
+On start the script asks for **language** (default **1 = English**):
+
+```text
+  1) English   (default)
+  2) Русский
+```
+
+Non-interactive:
+
+```bash
+LANG_UI=en bash setup-all.sh   # English (default)
+LANG_UI=ru bash setup-all.sh   # Russian
+```
 
 Interactive build (optional AppImage step):
 
 ```bash
 bash build.sh
 ```
+
+Result: `dist/GoClaw-Lite-x86_64.AppImage`
 
 ---
 
@@ -52,6 +66,13 @@ chmod +x GoClaw-Lite-x86_64.AppImage
 git clone https://github.com/reclaw17/goclaw-lite-cachyos.git
 cd goclaw-lite-cachyos
 bash setup-all.sh
+```
+
+При запуске будет выбор языка (**по умолчанию English**). Для русского:
+
+```bash
+LANG_UI=ru bash setup-all.sh
+# или выбери пункт 2 в меню
 ```
 
 Результат: `dist/GoClaw-Lite-x86_64.AppImage`

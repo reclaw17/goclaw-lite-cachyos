@@ -4,14 +4,15 @@ set -euo pipefail
 
 cd "$(cd "$(dirname "$0")" && pwd)"
 
-# --- Language selection ---
-LANG_UI="en"
-if [[ -t 0 ]]; then
+# --- Language (default: English) ---
+# Override: LANG_UI=ru bash build.sh
+LANG_UI="${LANG_UI:-en}"
+if [[ -t 0 && -z "${LANG_UI_SET:-}" ]]; then
   echo
   echo "======================================"
   echo " Language / Язык"
   echo "======================================"
-  echo "  1) English"
+  echo "  1) English   (default)"
   echo "  2) Русский"
   echo
   read -r -p "Choose / Выбери [1/2] (default 1): " lang_ans
@@ -20,6 +21,7 @@ if [[ -t 0 ]]; then
     *) LANG_UI="en" ;;
   esac
 fi
+export LANG_UI
 
 if [[ "$LANG_UI" == "ru" ]]; then
   TITLE="Сборка GoClaw Lite (CachyOS / Arch)"
@@ -36,7 +38,7 @@ if [[ "$LANG_UI" == "ru" ]]; then
   BIN_HINT="Бинарник: upstream/ui/desktop/build/bin/"
   YN_HINT="    Напиши: да или нет"
   PRESS="Нажми Enter для выхода"
-  PROMPT_YN="[да/нет]"
+  PROMPT_YN="[Y/n]"
 else
   TITLE="GoClaw Lite build (CachyOS / Arch)"
   INTRO="3–4 steps. Dependency install may ask for sudo password."
@@ -52,7 +54,7 @@ else
   BIN_HINT="Binary: upstream/ui/desktop/build/bin/"
   YN_HINT="    Type y or n"
   PRESS="Press Enter to exit"
-  PROMPT_YN="[y/N]"
+  PROMPT_YN="[Y/n]"
 fi
 
 echo
@@ -68,8 +70,8 @@ ask() {
   while true; do
     read -r -p "==> $q $PROMPT_YN: " a
     case "${a,,}" in
-      y|yes|д|да|"") return 0 ;;
       n|no|н|нет) return 1 ;;
+      y|yes|д|да|"") return 0 ;;
       *) echo "$YN_HINT" ;;
     esac
   done

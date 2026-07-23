@@ -4,14 +4,15 @@ set -euo pipefail
 
 cd "$(cd "$(dirname "$0")" && pwd)"
 
-# --- Language selection ---
-LANG_UI="en"
-if [[ -t 0 ]]; then
+# --- Language (default: English) ---
+# Override non-interactively: LANG_UI=ru bash setup-all.sh
+LANG_UI="${LANG_UI:-en}"
+if [[ -t 0 && -z "${LANG_UI_SET:-}" ]]; then
   echo
   echo "======================================"
   echo " Language / Язык"
   echo "======================================"
-  echo "  1) English"
+  echo "  1) English   (default)"
   echo "  2) Русский"
   echo
   read -r -p "Choose / Выбери [1/2] (default 1): " lang_ans
@@ -20,11 +21,12 @@ if [[ -t 0 ]]; then
     *) LANG_UI="en" ;;
   esac
 fi
+export LANG_UI
 
 if [[ "$LANG_UI" == "ru" ]]; then
   TITLE="GoClaw Lite — сборка CachyOS / Arch"
   INTRO="Сейчас выполнятся все шаги (нужен интернет; может занять время)."
-  CONT="Продолжить? [да/нет]: "
+  CONT="Продолжить? [Y/n]: "
   CANCEL="Отменено."
   S1="1/4 Зависимости для сборки"
   S2="2/4 Исходники GoClaw"
@@ -38,7 +40,7 @@ if [[ "$LANG_UI" == "ru" ]]; then
 else
   TITLE="GoClaw Lite — CachyOS / Arch build"
   INTRO="This will run all steps (needs network; may take a while)."
-  CONT="Continue? [y/N]: "
+  CONT="Continue? [Y/n]: "
   CANCEL="Cancelled."
   S1="1/4 Install build dependencies"
   S2="2/4 Clone upstream GoClaw"
@@ -62,8 +64,8 @@ echo
 if [[ -t 0 ]]; then
   read -r -p "$CONT" ans
   case "${ans,,}" in
-    y|yes|д|да|"") ;;
-    *) echo "$CANCEL"; exit 0 ;;
+    n|no|н|нет) echo "$CANCEL"; exit 0 ;;
+    *) ;; # default: continue
   esac
 fi
 

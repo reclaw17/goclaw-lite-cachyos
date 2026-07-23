@@ -1,16 +1,31 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "==> Установка зависимостей для GoClaw Lite (CachyOS/Arch)"
+LANG_UI="${LANG_UI:-en}"
+
+if [[ "$LANG_UI" == "ru" ]]; then
+  echo "==> Установка зависимостей для GoClaw Lite (CachyOS/Arch)"
+  NEED_PACMAN="==> Нужен pacman"
+  SYS="==> Системные пакеты"
+  DONE="==> Готово"
+  NO41="  webkit2gtk-4.1: НЕТ"
+  NO40="  webkit2gtk-4.0: нет (это нормально на CachyOS)"
+else
+  echo "==> Installing build dependencies for GoClaw Lite (CachyOS/Arch)"
+  NEED_PACMAN="==> pacman is required"
+  SYS="==> System packages"
+  DONE="==> Done"
+  NO41="  webkit2gtk-4.1: MISSING"
+  NO40="  webkit2gtk-4.0: not found (normal on CachyOS)"
+fi
 
 if ! command -v pacman >/dev/null 2>&1; then
-  echo "==> Нужен pacman"
+  echo "$NEED_PACMAN"
   exit 1
 fi
 
-echo "==> Системные пакеты"
-# На современном Arch/CachyOS пакет webkit2gtk (4.0) убран из репо.
-# Нужен webkit2gtk-4.1 + сборка с -tags webkit2_41
+echo "$SYS"
+# Modern Arch/CachyOS: webkit2gtk (4.0) is gone — use webkit2gtk-4.1 + build tag webkit2_41
 sudo pacman -Syu --needed --noconfirm \
   base-devel git go nodejs npm \
   gtk3 webkit2gtk-4.1 pkgconf gcc curl unzip
@@ -29,8 +44,8 @@ export PATH="$PATH:$(go env GOPATH)/bin"
 
 echo
 echo "==> pkg-config"
-pkg-config --exists webkit2gtk-4.1 && echo "  webkit2gtk-4.1: OK" || echo "  webkit2gtk-4.1: НЕТ"
-pkg-config --exists webkit2gtk-4.0 && echo "  webkit2gtk-4.0: OK" || echo "  webkit2gtk-4.0: нет (это нормально на CachyOS)"
+pkg-config --exists webkit2gtk-4.1 && echo "  webkit2gtk-4.1: OK" || echo "$NO41"
+pkg-config --exists webkit2gtk-4.0 && echo "  webkit2gtk-4.0: OK" || echo "$NO40"
 
 echo
 go version || true
@@ -39,4 +54,4 @@ pnpm -v || true
 wails version || true
 
 echo
-echo "==> Готово"
+echo "$DONE"
