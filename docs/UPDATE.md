@@ -1,85 +1,64 @@
-# Update system
+# Updates
 
-Quality design has **three layers**.
+## Can update live inside the AppImage?
 
-## Layer 1 — End users (portable USB / AppImage)
+**Yes — after you rebuild/republish an AppImage with the new launcher.**
+
+The AppImage **AppRun** wrapper supports:
 
 ```bash
-bash update.sh
-# Russian messages:
-LANG_UI=ru bash update.sh
+./GoClaw-Lite-x86_64.AppImage --check-update
+./GoClaw-Lite-x86_64.AppImage --update
+./GoClaw-Lite-x86_64.AppImage --help-update
 ```
 
-| Does | Does **not** |
-|------|----------------|
-| Checks **this repo** GitHub Releases | Watch upstream GoClaw git by itself |
-| Downloads newer `GoClaw-Lite-x86_64.AppImage` | Rebuild from source |
-| Backs up previous file as `.bak-TIMESTAMP` | Need pacman / Go / Wails |
+`--update` talks to **this packaging repo’s** GitHub Releases, downloads a newer
+`GoClaw-Lite-x86_64.AppImage`, backs up the old file, and replaces the one on disk.
 
-Stamp file: `dist/.goclaw-lite-version` (+ optional `dist/VERSION.json`).
+Optional notice on every start (off by default):
+
+```bash
+GOCLAW_LITE_AUTO_UPDATE=1 ./GoClaw-Lite-x86_64.AppImage
+```
+
+> Note: the AppImage already published as `v0.1.0-cachyos` was built **before**
+> this wrapper. Rebuild + publish a new release so users get embedded `--update`.
 
 ---
 
-## Layer 2 — Maintainers on CachyOS / Arch (rebuild from upstream)
-
-When **official** [nextlevelbuilder/goclaw](https://github.com/nextlevelbuilder/goclaw) moves ahead:
-
-```bash
-# only check
-bash scripts/check-upstream.sh
-echo $?
-# 0 = up to date, 2 = rebuild recommended
-
-# rebuild AppImage from latest upstream dev
-bash scripts/rebuild-from-upstream.sh
-
-# force rebuild even if SHA matches
-FORCE=1 bash scripts/rebuild-from-upstream.sh
-```
-
-Flow:
-
-1. `check-upstream.sh` compares `dist/VERSION.json` → remote `dev` commit
-2. `clone-upstream.sh` refreshes sources
-3. `build-lite.sh` + `package-appimage.sh`
-4. `write-version-stamp.sh` writes packaging tag + upstream SHA
-
-Then **publish** a GitHub Release so Layer 1 users receive it:
-
-```bash
-gh release create lite-<sha>-<date> dist/GoClaw-Lite-x86_64.AppImage \
-  --title "GoClaw Lite <tag>" \
-  --notes "Rebuilt from upstream commit <sha>"
-```
-
----
-
-## Layer 3 — CI watch (notification)
-
-Workflow `.github/workflows/watch-upstream.yml`:
-
-- runs on a schedule + manual dispatch
-- fetches latest upstream commit
-- uploads `upstream-status.json` artifact
-- does **not** promise a full AppImage on Ubuntu (WebKit/Wails is fragile in CI)
-- real portable builds stay on **CachyOS/Arch** (`rebuild-from-upstream.sh`) or a successful local package job
-
----
-
-## Recommended maintainer loop
+## Three layers
 
 ```text
-weekly / when needed
-  → bash scripts/check-upstream.sh
-  → if exit 2: bash scripts/rebuild-from-upstream.sh
-  → gh release create ...
-  → users run: bash update.sh
+Official GoClaw (nextlevelbuilder/goclaw)
+        │  rebuild-from-upstream / CI
+        ▼
+Our GitHub Releases (AppImage)
+        │  AppImage --update   OR   bash update.sh
+        ▼
+USB / PC
 ```
+
+| Method | Inside AppImage? | Rebuilds upstream? |
+|--------|------------------|--------------------|
+| `./AppImage --update` | **Yes** | No — downloads our Release |
+| `bash update.sh` | No (repo script) | No |
+| `bash rebuild-from-upstream.sh` | No | **Yes** (needs build PC) |
+| CI `watch-upstream.yml` | No | **Yes** (publishes Release) |
+
+Upstream source changes still require a **rebuild + new Release** first.
+Embedded update only distributes that Release to the USB copy.
 
 ---
 
-## Русский (кратко)
+## Russian
 
-- **Пользователь флешки:** `bash update.sh` — качает готовый AppImage из **наших** Releases.
-- **Новая версия в официальном GoClaw:** на CachyOS `bash scripts/rebuild-from-upstream.sh`, потом выложить Release.
-- **CI** только **проверяет** upstream; полноценная сборка AppImage — на Arch/CachyOS.
+**Да, можно вшить в AppImage** — через обёртку `AppRun`:
+
+```bash
+./GoClaw-Lite-x86_64.AppImage --update
+```
+
+Это обновит **файл AppImage** с наших Releases.  
+Новую версию **официального** GoClaw по-прежнему нужно сначала **пересобрать** (`rebuild-from-upstream` / CI) и выложить в Release.
+
+Старый релиз `v0.1.0-cachyos` ещё без этой обёртки — нужна одна пересборка и новый релиз.
