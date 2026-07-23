@@ -1,30 +1,46 @@
-# Build + AppImage
+# Build guide
 
-## На машине сборки (CachyOS / Arch)
+## English
+
+### Requirements (CachyOS / Arch)
+
+- `go`, `nodejs`, `npm` / `pnpm`
+- `gtk3`, `webkit2gtk-4.1`, `pkgconf`, `gcc`
+- Wails CLI: `go install github.com/wailsapp/wails/v2/cmd/wails@latest`
+
+Or:
 
 ```bash
-git clone https://github.com/reclaw17/goclaw-lite-cachyos.git
-cd goclaw-lite-cachyos
+bash scripts/install-deps-cachyos.sh
+```
 
+### Steps
+
+```bash
+bash scripts/clone-upstream.sh   # clones nextlevelbuilder/goclaw (dev)
+bash scripts/build-lite.sh       # wails build -tags sqliteonly,webkit2_41
+bash scripts/package-appimage.sh # → dist/GoClaw-Lite-x86_64.AppImage
+```
+
+One-shot:
+
+```bash
+bash всё-сразу.sh
+```
+
+Upstream source is not vendored in git; it is cloned into `upstream/` at build time.
+
+---
+
+## Русский
+
+```bash
 bash scripts/install-deps-cachyos.sh
 bash scripts/clone-upstream.sh
 bash scripts/build-lite.sh
 bash scripts/package-appimage.sh
 ```
 
-Артефакт:
-```text
-dist/GoClaw-Lite-x86_64.AppImage
-```
+Или: `bash всё-сразу.sh`
 
-## На флешке / другом ПК
-
-```bash
-chmod +x GoClaw-Lite-x86_64.AppImage
-./GoClaw-Lite-x86_64.AppImage
-```
-
-Если FUSE ругается:
-```bash
-./GoClaw-Lite-x86_64.AppImage --appimage-extract-and-run
-```
+Исходники GoClaw качаются в `upstream/` при сборке (официальный репозиторий).

@@ -1,39 +1,43 @@
-# Ошибка webkit2gtk-4.0
+# WebKit on CachyOS / Arch
 
-## Симптом
+## English
+
+**Symptom**
+
 ```text
-Package webkit2gtk-4.0 was not found in the pkg-config search path.
-ошибка: не найдена цель: webkit2gtk
+Package webkit2gtk-4.0 was not found
+error: target not found: webkit2gtk
 ```
 
-## Причина
-На **CachyOS / современном Arch** пакета `webkit2gtk` (ABI 4.0) в официальных репо **уже нет**.  
-Есть только `webkit2gtk-4.1`.
+**Cause**
 
-Wails по умолчанию ищет 4.0 → нужна сборка с тегом **`webkit2_41`**.
+Modern Arch/CachyOS no longer ship `webkit2gtk` (ABI 4.0) in the main repos.  
+They ship **`webkit2gtk-4.1`** only.
 
-## Исправление (правильное)
+Wails defaults to 4.0 unless you pass **`-tags webkit2_41`**.
 
-1. Убедись, что стоит 4.1:
+**Fix**
+
 ```bash
 sudo pacman -S --needed webkit2gtk-4.1 gtk3
 pkg-config --exists webkit2gtk-4.1 && echo OK
-```
 
-2. Обнови скрипты репо и собери:
-```bash
-cd /path/to/goclaw-lite-cachyos
-git pull
+# then rebuild with updated scripts (auto-detects 4.1)
 bash scripts/build-lite.sh
 ```
 
-В логе должно быть:
+Expected log line:
+
 ```text
 ==> WebKit: 4.1 (tag webkit2_41)
 ==> Tags: sqliteonly,webkit2_41
 ```
 
-## Не делай
-```bash
-sudo pacman -S webkit2gtk   # пакета нет → ошибка «не найдена цель»
-```
+Do **not** install a non-existent `webkit2gtk` package from official repos.
+
+---
+
+## Русский
+
+На CachyOS пакета `webkit2gtk` (4.0) нет. Нужен `webkit2gtk-4.1` и тег сборки `webkit2_41`.  
+Скрипт `build-lite.sh` добавляет его сам.

@@ -1,16 +1,19 @@
-# STATUS
+# Status
 
-**Date:** 2026-07-23
+**Release:** [v0.1.0-cachyos](https://github.com/reclaw17/goclaw-lite-cachyos/releases/tag/v0.1.0-cachyos)
 
-## Fixed
-- CachyOS/Arch: build uses `-tags sqliteonly,webkit2_41` when `webkit2gtk-4.1` is present
-- Do **not** require package `webkit2gtk` (4.0) — removed from official repos
-- `install-deps-cachyos.sh` installs only `webkit2gtk-4.1`
+## Working
 
-## User next step
-```bash
-cd goclaw-lite-cachyos
-git pull
-bash scripts/build-lite.sh
-bash scripts/package-appimage.sh
-```
+- Build on CachyOS with `-tags sqliteonly,webkit2_41`
+- AppImage packaging via `scripts/package-appimage.sh`
+- Documented EN + RU entry points
+
+## Upstream
+
+Application code: [nextlevelbuilder/goclaw](https://github.com/nextlevelbuilder/goclaw) (Lite / desktop / SQLite).
+
+This repository only provides Linux packaging scripts and community AppImage builds.
+
+## Not official
+
+Not an official GoClaw release channel. Use upstream for issues about the app itself.
