@@ -1,13 +1,13 @@
 # Start here
 
-Portable **GoClaw Lite** for **Arch Linux** and **CachyOS** (AppImage, SQLite).
+Portable **GoClaw Lite** for **Arch Linux** and **CachyOS**.
 
 ## English
 
-### Option A — Portable download
+### A) Download ready AppImage
 
-1. [Releases → v0.1.0-cachyos](https://github.com/reclaw17/goclaw-lite-cachyos/releases/tag/v0.1.0-cachyos)
-2. Download **GoClaw-Lite-x86_64.AppImage**
+1. [Releases](https://github.com/reclaw17/goclaw-lite-cachyos/releases)
+2. Download `GoClaw-Lite-x86_64.AppImage`
 3. Run:
 
 ```bash
@@ -15,16 +15,13 @@ chmod +x GoClaw-Lite-x86_64.AppImage
 ./GoClaw-Lite-x86_64.AppImage
 ```
 
-### Update later
+Update later:
 
 ```bash
-cd goclaw-lite-cachyos   # or the folder where update.sh lives
-bash update.sh
+./GoClaw-Lite-x86_64.AppImage --update
 ```
 
-See [docs/UPDATE.md](docs/UPDATE.md).
-
-### Option B — Build on Arch / CachyOS
+### B) Build on your CachyOS / Arch PC
 
 ```bash
 git clone https://github.com/reclaw17/goclaw-lite-cachyos.git
@@ -32,25 +29,34 @@ cd goclaw-lite-cachyos
 bash setup-all.sh
 ```
 
-Language menu default: **English**. Russian: choose `2` or `LANG_UI=ru`.
+### C) Build in the cloud (CI) — no local tools
+
+See **[docs/CI.md](docs/CI.md)**:
+
+1. Open **Actions** on GitHub  
+2. **Build AppImage** → **Run workflow**  
+3. Download the artifact / Release  
 
 ---
 
 ## Русский
 
-### Скачать
+### A) Скачать готовый файл
 
-[Релиз](https://github.com/reclaw17/goclaw-lite-cachyos/releases/tag/v0.1.0-cachyos) → `GoClaw-Lite-x86_64.AppImage`
-
-### Обновить
+[Releases](https://github.com/reclaw17/goclaw-lite-cachyos/releases) → `GoClaw-Lite-x86_64.AppImage`
 
 ```bash
-bash update.sh
-LANG_UI=ru bash update.sh
+chmod +x GoClaw-Lite-x86_64.AppImage
+./GoClaw-Lite-x86_64.AppImage
+./GoClaw-Lite-x86_64.AppImage --update   # позже
 ```
 
-### Собрать
+### B) Собрать у себя (CachyOS/Arch)
 
 ```bash
 bash setup-all.sh
 ```
+
+### C) Собрать в интернете (CI)
+
+Не нужно ставить Go и Wails. Инструкция простыми словами: **[docs/CI.md](docs/CI.md)**.

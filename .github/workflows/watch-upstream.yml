@@ -1,49 +1,124 @@
 name: Watch upstream GoClaw
 
+# Simple explanation:
+# Twice a week GitHub checks if the official GoClaw project has new commits.
+# If yes, it starts the same AppImage build as the "Build AppImage" button.
+
 on:
   schedule:
-    # Twice a week
     - cron: '0 6 * * 1,4'
   workflow_dispatch:
 
+permissions:
+  contents: write
+  actions: write
+
 jobs:
   check:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
+    name: Check official GoClaw for updates
+    runs-on: ubuntu-24.04
+    outputs:
+      rebuild: ${{ steps.decide.outputs.rebuild }}
+      short: ${{ steps.decide.outputs.short }}
+      sha: ${{ steps.decide.outputs.sha }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check upstream commit
-        id: up
+      - name: Decide if rebuild is needed
+        id: decide
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          chmod +x scripts/check-upstream.sh || true
-          set +e
-          bash scripts/check-upstream.sh
-          code=$?
-          set -e
-          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
-          if [[ -f dist/upstream-status.json ]]; then
-            cat dist/upstream-status.json
-            remote=$(python3 -c 'import json;print(json.load(open("dist/upstream-status.json")).get("remote_sha","")[:12])')
-            reason=$(python3 -c 'import json;print(json.load(open("dist/upstream-status.json")).get("reason",""))')
-            echo "remote_sha=$remote" >> "$GITHUB_OUTPUT"
-            echo "reason=$reason" >> "$GITHUB_OUTPUT"
+          set -euo pipefail
+          chmod +x scripts/*.sh || true
+
+          API="https://api.github.com/repos/nextlevelbuilder/goclaw/commits/dev"
+          SHA=$(curl -fsSL -H "Accept: application/vnd.github+json" -H "User-Agent: goclaw-lite-ci" "$API" \
+            | python3 -c 'import json,sys; print(json.load(sys.stdin).get("sha") or "")')
+          if [ -z "$SHA" ]; then
+            echo "Could not read upstream SHA"
+            exit 1
+          fi
+          SHORT="${SHA:0:7}"
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+          echo "short=$SHORT" >> "$GITHUB_OUTPUT"
+          echo "Upstream dev = $SHA"
+
+          # Skip if we already published upstream-SHORT
+          if gh release view "upstream-${SHORT}" --repo "${{ github.repository }}" >/dev/null 2>&1; then
+            echo "rebuild=false" >> "$GITHUB_OUTPUT"
+            echo "Release upstream-${SHORT} already exists — skip"
+          else
+            echo "rebuild=true" >> "$GITHUB_OUTPUT"
+            echo "No release for upstream-${SHORT} — will build"
           fi
 
-      - name: Upload upstream status
-        uses: actions/upload-artifact@v4
-        with:
-          name: upstream-status
-          path: dist/upstream-status.json
-          if-no-files-found: warn
+  build:
+    name: Build & release if upstream changed
+    needs: check
+    if: needs.check.outputs.rebuild == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
 
-      - name: Summary
+      - name: Install Ubuntu packages
         run: |
-          echo "### Upstream GoClaw check" >> "$GITHUB_STEP_SUMMARY"
-          echo "- reason: ${{ steps.up.outputs.reason }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- remote: ${{ steps.up.outputs.remote_sha }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- script exit: ${{ steps.up.outputs.exit_code }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "If update is available, rebuild on CachyOS/Arch:" >> "$GITHUB_STEP_SUMMARY"
-          echo "\`bash scripts/rebuild-from-upstream.sh\`" >> "$GITHUB_STEP_SUMMARY"
+          set -euo pipefail
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            build-essential pkg-config curl git ca-certificates \
+            libgtk-3-dev libwebkit2gtk-4.1-dev \
+            libnss3 libxss1 libasound2t64 \
+            fuse3 file python3
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26.x'
+          cache: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install pnpm + Wails
+        run: |
+          npm install -g pnpm
+          go install github.com/wailsapp/wails/v2/cmd/wails@v2.13.0
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+
+      - name: Build AppImage from upstream
+        env:
+          LANG_UI: en
+          CGO_ENABLED: '1'
+          GOCLAW_BRANCH: dev
+          VERSION: upstream-${{ needs.check.outputs.short }}
+          VERSION_TAG: upstream-${{ needs.check.outputs.short }}
+          APPIMAGE_EXTRACT_AND_RUN: '1'
+        run: |
+          set -euo pipefail
+          chmod +x scripts/*.sh
+          export PATH="$(go env GOPATH)/bin:$PATH"
+          bash scripts/clone-upstream.sh
+          bash scripts/build-lite.sh
+          bash scripts/package-appimage.sh
+          test -f dist/GoClaw-Lite-x86_64.AppImage
+
+      - name: Publish Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: upstream-${{ needs.check.outputs.short }}
+          name: GoClaw Lite AppImage (upstream ${{ needs.check.outputs.short }})
+          files: dist/GoClaw-Lite-x86_64.AppImage
+          body: |
+            Auto-built when official GoClaw (`dev`) moved to
+            `${{ needs.check.outputs.sha }}`.
+
+            ```bash
+            chmod +x GoClaw-Lite-x86_64.AppImage
+            ./GoClaw-Lite-x86_64.AppImage
+            # later:
+            ./GoClaw-Lite-x86_64.AppImage --update
+            ```
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

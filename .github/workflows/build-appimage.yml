@@ -1,78 +1,146 @@
 name: Build AppImage
 
+# What is this?
+# GitHub automatically builds the portable AppImage on a cloud Ubuntu PC.
+# You do not need to know CI — open the Actions tab and press "Run workflow".
+
 on:
   workflow_dispatch:
+    inputs:
+      publish_release:
+        description: 'Also publish a GitHub Release with the AppImage'
+        type: boolean
+        default: true
+  # Optional: rebuild when packaging scripts change
   push:
     branches: [main]
     paths:
       - 'scripts/**'
       - '.github/workflows/build-appimage.yml'
-      - 'setup-all.sh'
-      - 'build.sh'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-appimage-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
+    name: Build GoClaw Lite AppImage
     runs-on: ubuntu-24.04
+    timeout-minutes: 90
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout this repo
+        uses: actions/checkout@v4
 
-      - name: Install OS deps
+      - name: Install Ubuntu packages
         run: |
+          set -euo pipefail
           sudo apt-get update
-          sudo apt-get install -y \
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            build-essential pkg-config curl git ca-certificates \
             libgtk-3-dev libwebkit2gtk-4.1-dev \
-            build-essential curl git \
-            libnss3 libxss1 pkg-config fuse3
+            libnss3 libxss1 libasound2t64 \
+            fuse3 file python3
+          # WebKit ABI check (must be 4.1 on Ubuntu 24.04)
+          pkg-config --exists webkit2gtk-4.1 && echo "webkit2gtk-4.1 OK"
+          pkg-config --modversion webkit2gtk-4.1 || true
 
-      - uses: actions/setup-go@v5
+      - name: Setup Go
+        uses: actions/setup-go@v5
         with:
           go-version: '1.26.x'
+          cache: true
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: '22'
 
-      - name: Install pnpm + wails
+      - name: Install pnpm + Wails
         run: |
+          set -euo pipefail
           npm install -g pnpm
-          go install github.com/wailsapp/wails/v2/cmd/wails@latest
+          # Pin major line compatible with upstream go.mod (v2)
+          go install github.com/wailsapp/wails/v2/cmd/wails@v2.13.0
           echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+          export PATH="$(go env GOPATH)/bin:$PATH"
+          go version
+          node -v
+          pnpm -v
           wails version
           wails doctor || true
 
-      - name: Clone upstream
-        run: |
-          chmod +x scripts/*.sh setup-all.sh build.sh || true
-          bash scripts/clone-upstream.sh
+      - name: Make scripts executable
+        run: chmod +x scripts/*.sh setup-all.sh build.sh update.sh 2>/dev/null || true
 
-      - name: Build Lite
-        run: bash scripts/build-lite.sh
+      - name: Clone official GoClaw sources
+        env:
+          LANG_UI: en
+          GOCLAW_BRANCH: dev
+        run: bash scripts/clone-upstream.sh
+
+      - name: Build Lite (sqliteonly + webkit2_41)
+        env:
+          LANG_UI: en
+          CGO_ENABLED: '1'
+          VERSION: ci-${{ github.run_number }}
+        run: |
+          set -euo pipefail
+          export PATH="$(go env GOPATH)/bin:$PATH"
+          bash scripts/build-lite.sh
 
       - name: Package AppImage
-        run: bash scripts/package-appimage.sh
+        env:
+          LANG_UI: en
+          # appimagetool cannot mount FUSE in many CI sandboxes
+          APPIMAGE_EXTRACT_AND_RUN: '1'
+          VERSION_TAG: ci-${{ github.run_number }}
+        run: |
+          set -euo pipefail
+          bash scripts/package-appimage.sh
+          test -f dist/GoClaw-Lite-x86_64.AppImage
+          ls -lh dist/GoClaw-Lite-x86_64.AppImage
+          file dist/GoClaw-Lite-x86_64.AppImage || true
 
-      - name: Upload AppImage artifact
+      - name: Upload AppImage (download from Actions)
         uses: actions/upload-artifact@v4
-        if: always()
         with:
-          name: GoClaw-Lite-AppImage
-          path: dist/*.AppImage
-          if-no-files-found: warn
+          name: GoClaw-Lite-x86_64-AppImage
+          path: |
+            dist/GoClaw-Lite-x86_64.AppImage
+            dist/.goclaw-lite-version
+            dist/.upstream-revision
+          if-no-files-found: error
 
-      - name: Publish release
-        if: success()
+      - name: Publish GitHub Release
+        if: >-
+          success() &&
+          (github.event_name == 'workflow_dispatch' && inputs.publish_release == true)
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: lite-linux-${{ github.run_number }}
-          name: GoClaw Lite Linux AppImage #${{ github.run_number }}
-          draft: false
-          files: dist/*.AppImage
+          tag_name: ci-${{ github.run_number }}
+          name: GoClaw Lite AppImage (CI #${{ github.run_number }})
+          files: dist/GoClaw-Lite-x86_64.AppImage
+          generate_release_notes: false
           body: |
-            Experimental Linux GoClaw Lite AppImage (community packaging).
+            Portable **GoClaw Lite** AppImage (community build for Arch/CachyOS users).
 
+            Built on Ubuntu 24.04 CI from upstream `nextlevelbuilder/goclaw` (dev).
+
+            ### Run
             ```bash
             chmod +x GoClaw-Lite-x86_64.AppImage
             ./GoClaw-Lite-x86_64.AppImage
             ```
+
+            ### Update later (if this build includes embedded updater)
+            ```bash
+            ./GoClaw-Lite-x86_64.AppImage --update
+            ```
+
+            Not an official upstream release.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
