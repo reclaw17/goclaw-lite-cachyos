@@ -52,7 +52,7 @@ If your system complains about FUSE:
 ./GoClaw-Lite-x86_64.AppImage --appimage-extract-and-run
 ```
 
-Direct download (when the asset is published):
+Direct download:
 
 ```bash
 curl -L --fail -o GoClaw-Lite-x86_64.AppImage \
@@ -67,8 +67,11 @@ chmod +x GoClaw-Lite-x86_64.AppImage
 git clone https://github.com/reclaw17/goclaw-lite-cachyos.git
 cd goclaw-lite-cachyos
 bash всё-сразу.sh
-# or: bash scripts/install-deps-cachyos.sh && bash scripts/clone-upstream.sh \
-#        && bash scripts/build-lite.sh && bash scripts/package-appimage.sh
+# or step by step:
+# bash scripts/install-deps-cachyos.sh
+# bash scripts/clone-upstream.sh
+# bash scripts/build-lite.sh
+# bash scripts/package-appimage.sh
 ```
 
 Output:
@@ -81,12 +84,50 @@ dist/GoClaw-Lite-x86_64.AppImage
 Build scripts automatically use `-tags sqliteonly,webkit2_41`.  
 See [docs/FIX-WEBKIT.md](docs/FIX-WEBKIT.md).
 
+### FAQ
+
+**Is this the official GoClaw?**  
+No. This is an **unofficial community packaging** of the official **GoClaw Lite** sources. Support upstream first: [nextlevelbuilder/goclaw](https://github.com/nextlevelbuilder/goclaw).
+
+**Lite or Standard — which one is this?**  
+**Lite.** SQLite desktop app (Wails). Not the server edition that needs PostgreSQL.
+
+**Do I need PostgreSQL / Docker?**  
+**No** for this AppImage.
+
+**Does it work offline?**  
+The app starts offline. Chat still needs a configured provider (cloud API or a local OpenAI-compatible endpoint you point it to).
+
+**USB / portable?**  
+Yes for the **AppImage file** itself. Copy one file to a USB stick and run it on compatible Linux x86_64 machines. System libraries (WebKit/GTK) may still need to exist on the host.
+
+**Why was `webkit2gtk` package missing?**  
+On modern CachyOS/Arch the old `webkit2gtk` (4.0) package is gone. Use `webkit2gtk-4.1` and build with tag `webkit2_41`.
+
+**Build fails with `webkit2gtk-4.0 not found`**  
+Update scripts (`git pull`) and rebuild. Tags must include `webkit2_41`. Details: [docs/FIX-WEBKIT.md](docs/FIX-WEBKIT.md).
+
+**AppImage says FUSE error**  
+Run: `./GoClaw-Lite-x86_64.AppImage --appimage-extract-and-run`
+
+**Windows / macOS?**  
+This repo targets **Linux AppImage**. Official Lite install scripts for macOS/Windows live upstream.
+
+**Can I use local models (Fabric / llama.cpp)?**  
+Point an OpenAI-compatible provider URL in the setup wizard to your local server (for example Fabric on `http://127.0.0.1:8080/v1`).
+
+**Where is the binary after build?**  
+`upstream/ui/desktop/build/bin/goclaw-lite` and packaged as `dist/GoClaw-Lite-x86_64.AppImage`.
+
+**Is data stored on the USB stick?**  
+Depends on GoClaw Lite paths. Expect local config/DB under the user profile unless you configure otherwise. Treat USB as the app carrier first.
+
 ### Credits
 
 - **GoClaw** by [nextlevelbuilder](https://github.com/nextlevelbuilder/goclaw) — original agent platform
 - Packaging / CachyOS scripts — this repository
 
-Please star and support **upstream** if you use GoClaw:
+Please star and support **upstream** if you use GoClaw:  
 https://github.com/nextlevelbuilder/goclaw
 
 ### License
@@ -136,6 +177,44 @@ bash всё-сразу.sh
 
 На CachyOS нужен `webkit2gtk-4.1` (пакета `webkit2gtk` 4.0 в репо нет).  
 Скрипт сам включает тег `webkit2_41`.
+
+### Частые вопросы (FAQ)
+
+**Это официальный GoClaw?**  
+Нет. Это **неофициальная community-сборка** официального **GoClaw Lite**. Поддержите upstream: [nextlevelbuilder/goclaw](https://github.com/nextlevelbuilder/goclaw).
+
+**Lite или Standard?**  
+**Lite.** Desktop на SQLite. Не серверная версия с PostgreSQL.
+
+**Нужны PostgreSQL и Docker?**  
+**Нет** для этого AppImage.
+
+**Работает ли офлайн?**  
+Приложение запускается без сети. Для чата нужен настроенный провайдер (облако или локальный OpenAI-compatible endpoint).
+
+**Можно с флешки?**  
+Да: копируешь один AppImage. На другом Linux x86_64 могут понадобиться системные библиотеки (WebKit/GTK).
+
+**Почему нет пакета `webkit2gtk`?**  
+В современном CachyOS/Arch старый 4.0 убрали. Нужен `webkit2gtk-4.1` и тег сборки `webkit2_41`.
+
+**Ошибка `webkit2gtk-4.0 not found`**  
+Обнови скрипты (`git pull`) и пересобери. Подробности: [docs/FIX-WEBKIT.md](docs/FIX-WEBKIT.md).
+
+**AppImage ругается на FUSE**  
+Запуск: `./GoClaw-Lite-x86_64.AppImage --appimage-extract-and-run`
+
+**Windows / macOS?**  
+Этот репозиторий — **Linux AppImage**. Официальные Lite-скрипты для macOS/Windows — у upstream.
+
+**Локальные модели (Fabric / llama.cpp)?**  
+В мастере настройки укажи OpenAI-compatible URL локального сервера (например Fabric `http://127.0.0.1:8080/v1`).
+
+**Где бинарник после сборки?**  
+`upstream/ui/desktop/build/bin/goclaw-lite` и `dist/GoClaw-Lite-x86_64.AppImage`.
+
+**Данные хранятся на флешке?**  
+Обычно конфиг/БД Lite живут в профиле пользователя. Флешка в первую очередь носитель приложения.
 
 ### Благодарности
 
