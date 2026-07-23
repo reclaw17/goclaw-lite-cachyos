@@ -1,0 +1,7 @@
+upstream/
+*.log
+build/
+dist/
+.env
+.DS_Store
+node_modules/
