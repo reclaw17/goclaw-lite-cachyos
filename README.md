@@ -2,28 +2,40 @@
 
 Сборка **GoClaw Lite** для CachyOS/Arch и упаковка в **AppImage** (запуск с флешки).
 
+**Опыт программиста не обязателен.**
+
+---
+
+## Ссылка
+
+https://github.com/reclaw17/goclaw-lite-cachyos
+
 ---
 
 ## Для новичка
 
-1. Открой файл **`НАЧНИ-ЗДЕСЬ.txt`**
-2. В терминале в папке проекта запусти:
+Открой файл **[НАЧНИ-ЗДЕСЬ.txt](НАЧНИ-ЗДЕСЬ.txt)**
+
+Коротко:
+
+1. Скачай ZIP с GitHub (**Code → Download ZIP**) или сделай `git clone`
+2. Открой терминал в папке проекта
+3. Выполни по очереди:
 
 ```bash
-bash собрать.sh
+bash scripts/install-deps-cachyos.sh
+bash scripts/clone-upstream.sh
+bash scripts/build-lite.sh
+bash scripts/package-appimage.sh
 ```
 
-Скрипт сам проведёт по шагам и спросит про AppImage.
-
----
-
-## Что получится
+4. Возьми файл:
 
 ```text
 dist/GoClaw-Lite-x86_64.AppImage
 ```
 
-На флешке:
+5. На флешке:
 
 ```bash
 chmod +x GoClaw-Lite-x86_64.AppImage
@@ -32,10 +44,28 @@ chmod +x GoClaw-Lite-x86_64.AppImage
 
 ---
 
+## Зачем это
+
+- GoClaw Lite = без PostgreSQL (SQLite)
+- AppImage = “всё с собой”, как portable на Windows
+- Зависимости ставятся только на ПК сборки
+
+---
+
+## Если что-то сломалось
+
+Пришли текст ошибки из терминала. Не нужно всё удалять.
+
+---
+
 ## Запасной путь
 
 CLI / тонкий harness — см. `docs/CLI-FALLBACK.md`
 
-Основной USB-проект: https://github.com/reclaw17/goclaw-setup-my-pc
+Основной USB-агент: https://github.com/reclaw17/goclaw-setup-my-pc
 
-Upstream GoClaw: https://github.com/nextlevelbuilder/goclaw
+---
+
+## License
+
+Скрипты — MIT. GoClaw — лицензия upstream.
