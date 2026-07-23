@@ -7,7 +7,8 @@ on:
     paths:
       - 'scripts/**'
       - '.github/workflows/build-appimage.yml'
-      - 'всё-сразу.sh'
+      - 'setup-all.sh'
+      - 'build.sh'
 
 jobs:
   build:
@@ -41,7 +42,7 @@ jobs:
 
       - name: Clone upstream
         run: |
-          chmod +x scripts/*.sh || true
+          chmod +x scripts/*.sh setup-all.sh build.sh || true
           bash scripts/clone-upstream.sh
 
       - name: Build Lite
@@ -67,16 +68,11 @@ jobs:
           draft: false
           files: dist/*.AppImage
           body: |
-            Experimental **Linux** GoClaw Lite AppImage (not official upstream).
+            Experimental Linux GoClaw Lite AppImage (community packaging).
 
             ```bash
             chmod +x GoClaw-Lite-x86_64.AppImage
             ./GoClaw-Lite-x86_64.AppImage
-            ```
-
-            If FUSE errors:
-            ```bash
-            ./GoClaw-Lite-x86_64.AppImage --appimage-extract-and-run
             ```
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

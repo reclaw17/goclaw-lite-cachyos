@@ -2,37 +2,19 @@
 
 ## English
 
-### Requirements (CachyOS / Arch)
-
-- `go`, `nodejs`, `npm` / `pnpm`
-- `gtk3`, `webkit2gtk-4.1`, `pkgconf`, `gcc`
-- Wails CLI: `go install github.com/wailsapp/wails/v2/cmd/wails@latest`
-
-Or:
+### One-shot
 
 ```bash
-bash scripts/install-deps-cachyos.sh
+bash setup-all.sh
+```
+
+### Interactive
+
+```bash
+bash build.sh
 ```
 
 ### Steps
-
-```bash
-bash scripts/clone-upstream.sh   # clones nextlevelbuilder/goclaw (dev)
-bash scripts/build-lite.sh       # wails build -tags sqliteonly,webkit2_41
-bash scripts/package-appimage.sh # → dist/GoClaw-Lite-x86_64.AppImage
-```
-
-One-shot:
-
-```bash
-bash всё-сразу.sh
-```
-
-Upstream source is not vendored in git; it is cloned into `upstream/` at build time.
-
----
-
-## Русский
 
 ```bash
 bash scripts/install-deps-cachyos.sh
@@ -41,6 +23,16 @@ bash scripts/build-lite.sh
 bash scripts/package-appimage.sh
 ```
 
-Или: `bash всё-сразу.sh`
+Upstream GoClaw is cloned into `upstream/` at build time (not vendored in git).
 
-Исходники GoClaw качаются в `upstream/` при сборке (официальный репозиторий).
+WebKit on CachyOS/Arch: [docs/FIX-WEBKIT.md](docs/FIX-WEBKIT.md)
+
+---
+
+## Русский
+
+```bash
+bash setup-all.sh
+# или
+bash build.sh
+```
