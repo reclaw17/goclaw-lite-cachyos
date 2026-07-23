@@ -2,22 +2,15 @@
 
 **Date:** 2026-07-23
 
-## Decision
+## Fixed
+- CachyOS/Arch: build uses `-tags sqliteonly,webkit2_41` when `webkit2gtk-4.1` is present
+- Do **not** require package `webkit2gtk` (4.0) — removed from official repos
+- `install-deps-cachyos.sh` installs only `webkit2gtk-4.1`
 
-Primary path: **build GoClaw Lite on CachyOS → package AppImage → run from USB**
-
-CLI harness / console coding agents = fallback.
-
-## Done
-
-- Repo scaffold
-- install-deps / clone-upstream / build-lite scripts
-- `scripts/package-appimage.sh`
-- docs: APPIMAGE, CLI-FALLBACK
-
-## Next
-
-1. User runs build on CachyOS
-2. Fix build errors if any
-3. Produce first AppImage
-4. Test AppImage on clean Linux host / USB
+## User next step
+```bash
+cd goclaw-lite-cachyos
+git pull
+bash scripts/build-lite.sh
+bash scripts/package-appimage.sh
+```

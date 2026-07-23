@@ -3,21 +3,37 @@
 ## Симптом
 ```text
 Package webkit2gtk-4.0 was not found in the pkg-config search path.
+ошибка: не найдена цель: webkit2gtk
 ```
 
 ## Причина
-На CachyOS/Arch часто стоит только `webkit2gtk-4.1`.  
-Wails по умолчанию ищет **webkit2gtk-4.0**.
+На **CachyOS / современном Arch** пакета `webkit2gtk` (ABI 4.0) в официальных репо **уже нет**.  
+Есть только `webkit2gtk-4.1`.
 
-## Исправление
+Wails по умолчанию ищет 4.0 → нужна сборка с тегом **`webkit2_41`**.
+
+## Исправление (правильное)
+
+1. Убедись, что стоит 4.1:
 ```bash
-sudo pacman -S --needed webkit2gtk
-pkg-config --exists webkit2gtk-4.0 && echo OK
+sudo pacman -S --needed webkit2gtk-4.1 gtk3
+pkg-config --exists webkit2gtk-4.1 && echo OK
 ```
 
-Потом снова:
+2. Обнови скрипты репо и собери:
 ```bash
+cd /path/to/goclaw-lite-cachyos
+git pull
 bash scripts/build-lite.sh
-# или
-bash всё-сразу.sh
+```
+
+В логе должно быть:
+```text
+==> WebKit: 4.1 (tag webkit2_41)
+==> Tags: sqliteonly,webkit2_41
+```
+
+## Не делай
+```bash
+sudo pacman -S webkit2gtk   # пакета нет → ошибка «не найдена цель»
 ```
