@@ -1,17 +1,15 @@
 name: Build AppImage
 
-# What is this?
-# GitHub automatically builds the portable AppImage on a cloud Ubuntu PC.
-# You do not need to know CI — open the Actions tab and press "Run workflow".
+# Simple meaning: GitHub builds the AppImage for you in the cloud.
+# Open Actions → this workflow → Run workflow → download the file.
 
 on:
   workflow_dispatch:
     inputs:
       publish_release:
-        description: 'Also publish a GitHub Release with the AppImage'
+        description: 'Also try to publish a GitHub Release'
         type: boolean
         default: true
-  # Optional: rebuild when packaging scripts change
   push:
     branches: [main]
     paths:
@@ -20,6 +18,7 @@ on:
 
 permissions:
   contents: write
+  actions: read
 
 concurrency:
   group: build-appimage-${{ github.ref }}
@@ -44,7 +43,6 @@ jobs:
             libgtk-3-dev libwebkit2gtk-4.1-dev \
             libnss3 libxss1 libasound2t64 \
             fuse3 file python3
-          # WebKit ABI check (must be 4.1 on Ubuntu 24.04)
           pkg-config --exists webkit2gtk-4.1 && echo "webkit2gtk-4.1 OK"
           pkg-config --modversion webkit2gtk-4.1 || true
 
@@ -52,7 +50,8 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: '1.26.x'
-          cache: true
+          # This packaging repo has no go.sum — avoid noisy cache restore errors
+          cache: false
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -63,7 +62,6 @@ jobs:
         run: |
           set -euo pipefail
           npm install -g pnpm
-          # Pin major line compatible with upstream go.mod (v2)
           go install github.com/wailsapp/wails/v2/cmd/wails@v2.13.0
           echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
           export PATH="$(go env GOPATH)/bin:$PATH"
@@ -95,7 +93,6 @@ jobs:
       - name: Package AppImage
         env:
           LANG_UI: en
-          # appimagetool cannot mount FUSE in many CI sandboxes
           APPIMAGE_EXTRACT_AND_RUN: '1'
           VERSION_TAG: ci-${{ github.run_number }}
         run: |
@@ -105,7 +102,7 @@ jobs:
           ls -lh dist/GoClaw-Lite-x86_64.AppImage
           file dist/GoClaw-Lite-x86_64.AppImage || true
 
-      - name: Upload AppImage (download from Actions)
+      - name: Upload AppImage artifact
         uses: actions/upload-artifact@v4
         with:
           name: GoClaw-Lite-x86_64-AppImage
@@ -115,10 +112,14 @@ jobs:
             dist/.upstream-revision
           if-no-files-found: error
 
+      # Release only on manual Run workflow — never fail the green build if publish is blocked
       - name: Publish GitHub Release
+        id: release
         if: >-
           success() &&
-          (github.event_name == 'workflow_dispatch' && inputs.publish_release == true)
+          github.event_name == 'workflow_dispatch' &&
+          inputs.publish_release == true
+        continue-on-error: true
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ci-${{ github.run_number }}
@@ -126,7 +127,7 @@ jobs:
           files: dist/GoClaw-Lite-x86_64.AppImage
           generate_release_notes: false
           body: |
-            Portable **GoClaw Lite** AppImage (community build for Arch/CachyOS users).
+            Portable **GoClaw Lite** AppImage (community build for Arch/CachyOS).
 
             Built on Ubuntu 24.04 CI from upstream `nextlevelbuilder/goclaw` (dev).
 
@@ -136,7 +137,7 @@ jobs:
             ./GoClaw-Lite-x86_64.AppImage
             ```
 
-            ### Update later (if this build includes embedded updater)
+            ### Update later
             ```bash
             ./GoClaw-Lite-x86_64.AppImage --update
             ```
@@ -144,3 +145,9 @@ jobs:
             Not an official upstream release.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Notice if release publish failed
+        if: steps.release.outcome == 'failure'
+        run: |
+          echo "::warning::Release publish failed (token/permissions). The AppImage artifact is still available under Actions → Artifacts."
+          echo "Fix: Settings → Actions → General → Workflow permissions → Read and write."
