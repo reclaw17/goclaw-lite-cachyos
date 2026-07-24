@@ -6,88 +6,86 @@
 
 <p align="center">
   <strong>Portable GoClaw Lite for Arch Linux and CachyOS</strong><br/>
-  Unofficial AppImage · SQLite · USB-friendly · auto-update<br/>
-  <em>Packaging track: finalized for personal use</em>
+  Unofficial community AppImage · SQLite · USB-friendly · auto-update
 </p>
 
 <p align="center">
-  <a href="https://github.com/reclaw17/goclaw-lite-cachyos/releases"><img alt="Release" src="https://img.shields.io/badge/releases-AppImage-blue?style=flat-square"></a>
+  <a href="https://github.com/reclaw17/goclaw-lite-cachyos/releases/tag/v0.2.0-cachyos"><img alt="Latest" src="https://img.shields.io/badge/Latest-v0.2.0--cachyos-blue?style=for-the-badge"></a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/reclaw17/goclaw-lite-cachyos/releases/tag/v0.2.0-cachyos"><img alt="Release" src="https://img.shields.io/badge/release-v0.2.0--cachyos-blue?style=flat-square"></a>
   <img alt="Portable" src="https://img.shields.io/badge/portable-AppImage-success?style=flat-square">
   <img alt="Arch" src="https://img.shields.io/badge/Arch%20%7C%20CachyOS-supported-green?style=flat-square">
+  <img alt="License" src="https://img.shields.io/badge/license-MIT%20(scripts)-lightgrey?style=flat-square">
   <a href="https://github.com/nextlevelbuilder/goclaw"><img alt="Upstream" src="https://img.shields.io/badge/upstream-GoClaw%20Lite-orange?style=flat-square"></a>
 </p>
 
 ---
 
+## Important (read this)
+
+- **Unofficial.** Community packaging only — **not** a product of [nextlevelbuilder](https://github.com/nextlevelbuilder) / official GoClaw.
+- **Target:** **Arch Linux** and **CachyOS**, Linux **x86_64** AppImage.
+- **Secrets:** API keys stay on **your** machine. Releases contain **no** keys.
+- **Support:** best effort. App bugs (for example log spam like `list_tenants_failed` / SQLite `settings` scan) belong to **upstream GoClaw Lite**, not “broken USB packaging”. Report serious app issues upstream: https://github.com/nextlevelbuilder/goclaw
+- **This repo** = build scripts + AppImage + update helpers. Not the full USB-agent product (skills, Fabric, OpenWrt, Windows stack).
+
+---
+
 ## English
 
-### What is this?
+### Latest download
 
-Community **portable AppImage** of official **[GoClaw Lite](https://github.com/nextlevelbuilder/goclaw)** for **Arch Linux** and **CachyOS** (SQLite, no PostgreSQL).
-
-This repository is **only packaging** (build scripts + AppImage + update).  
-It is **not** the full USB-agent product (skills, Fabric, OpenWrt, Windows stack).
-
-### How to use correctly
-
-| Method | Who it is for |
-|--------|----------------|
-| **Actions → Build AppImage → Run workflow** | Normal path — no local compile |
-| [Releases](https://github.com/reclaw17/goclaw-lite-cachyos/releases) download | Fastest if a Release already exists |
-| `./GoClaw-Lite-x86_64.AppImage --update` | Update the file on USB/disk |
-| `bash setup-all.sh` on your PC | If CI is red, or native CachyOS build |
-
-### Quick start
+**[v0.2.0-cachyos](https://github.com/reclaw17/goclaw-lite-cachyos/releases/tag/v0.2.0-cachyos)** → `GoClaw-Lite-x86_64.AppImage`
 
 ```bash
 chmod +x GoClaw-Lite-x86_64.AppImage
 ./GoClaw-Lite-x86_64.AppImage
 ```
 
-### How to update
+### How to use
 
-Prefer the **newest** Release (not only `v0.1.0-cachyos`).
+| Method | Who it is for |
+|--------|----------------|
+| [Releases](https://github.com/reclaw17/goclaw-lite-cachyos/releases) | Fastest — download ready file |
+| **Actions → Build AppImage → Run workflow** | Cloud build, no local compile |
+| `./GoClaw-Lite-x86_64.AppImage --update` | Update file on USB/disk |
+| `bash setup-all.sh` on CachyOS/Arch | Native rebuild |
+
+### Update
 
 ```bash
-# A) embedded (newer AppImages)
 ./GoClaw-Lite-x86_64.AppImage --check-update
 ./GoClaw-Lite-x86_64.AppImage --update
-
-# B) repo script
+# or
 bash update.sh
-
-# C) manual download from Releases
 ```
 
-Details: [docs/UPDATE.md](docs/UPDATE.md) · CI: [docs/CI.md](docs/CI.md) · Tails closed: [docs/TAILS.md](docs/TAILS.md) · [STATUS.md](STATUS.md)
+Docs: [docs/UPDATE.md](docs/UPDATE.md) · [docs/CI.md](docs/CI.md) · [START-HERE.md](START-HERE.md) · [STATUS.md](STATUS.md)
 
 ### License
 
-Scripts: MIT · GoClaw app: upstream license
+- **Scripts & docs in this repo:** [MIT](LICENSE)
+- **GoClaw application:** upstream license
 
 ---
 
 ## Russian
 
-**Портативный GoClaw Lite** для **Arch / CachyOS**.  
-Ветка **упаковки финализирована** для личного использования.
+### Важно
 
-### Как пользоваться
+- **Неофициально.** Community-сборка, **не** продукт nextlevelbuilder.
+- **Цель:** **Arch / CachyOS**, Linux x86_64 AppImage.
+- **Секреты:** API-ключи только у вас; в релизе их нет.
+- **Поддержка:** best effort. Ошибки вроде `list_tenants_failed` в логе — сторона **upstream Lite + SQLite**, не «сломанная флешка». Серьёзные баги приложения — в https://github.com/nextlevelbuilder/goclaw
 
-| Способ | Для кого |
-|--------|----------|
-| **Actions → Build AppImage → Run workflow** | Обычный путь без компиляции |
-| [Releases](https://github.com/reclaw17/goclaw-lite-cachyos/releases) | Скачать готовый файл |
-| `./GoClaw-Lite-x86_64.AppImage --update` | Обновить на флешке |
-| `bash setup-all.sh` | Запасной путь / родная сборка CachyOS |
+### Скачать
 
-### Обновление
-
-Бери **последний** Release (например `lite-linux-14` или новее).
+**[v0.2.0-cachyos](https://github.com/reclaw17/goclaw-lite-cachyos/releases/tag/v0.2.0-cachyos)**
 
 ```bash
+chmod +x GoClaw-Lite-x86_64.AppImage
+./GoClaw-Lite-x86_64.AppImage
 ./GoClaw-Lite-x86_64.AppImage --update
-bash update.sh
 ```
-
-Хвосты закрыты: [docs/TAILS.md](docs/TAILS.md) · [STATUS.md](STATUS.md)
